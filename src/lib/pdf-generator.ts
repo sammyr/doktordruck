@@ -3,11 +3,12 @@
 
 import jsPDF from 'jspdf'
 import paperSizes from '@/data/paper-sizes.json'
+import { TextBlock } from '@/types/text'
 
 interface PdfGeneratorOptions {
   pageSize: string
   backgroundColor: string
-  content?: string
+  content: TextBlock[]
 }
 
 export const generatePDF = async (options: PdfGeneratorOptions) => {
@@ -80,12 +81,53 @@ export const generatePDF = async (options: PdfGeneratorOptions) => {
     height + (bleed * 2) + 20
   )
 
-  // Wenn Inhalt vorhanden ist, füge ihn im Druckbereich ein
-  if (options.content) {
-    pdf.setTextColor(0)
-    pdf.setFontSize(12)
-    pdf.text(options.content, printArea.left, printArea.top)
-  }
+  // Füge alle Textblöcke ein
+  options.content.forEach(block => {
+    // Schriftart-Mapping für PDF
+    const fontMapping: { [key: string]: string } = {
+      'Inter': 'helvetica',
+      'Arial': 'helvetica',
+      'Times New Roman': 'times',
+      'Courier New': 'courier',
+      'Georgia': 'times',
+      'Verdana': 'helvetica'
+    }
+
+    // Setze die Schriftart mit Fallback
+    const fontFamily = fontMapping[block.fontFamily] || 'helvetica'
+    const fontStyle = block.fontStyle === 'italic' ? 'italic' : 
+                     block.fontStyle === 'bold' ? 'bold' : 'normal'
+    
+    pdf.setFont(fontFamily, fontStyle)
+    
+    // Schriftgrößenberechnung für exakte Übertragung von Bildschirm zu PDF
+    const FONT_SCALE_FACTOR = 3.5
+    const fontSize = block.fontSize * FONT_SCALE_FACTOR
+    pdf.setFontSize(fontSize)
+    
+    // Setze die Textfarbe
+    const color = block.color || '#000000'
+    const r = parseInt(color.slice(1, 3), 16)
+    const g = parseInt(color.slice(3, 5), 16)
+    const b = parseInt(color.slice(5, 7), 16)
+    pdf.setTextColor(r, g, b)
+
+    // Berechne die Position
+    // Die x,y-Koordinaten im TextBlock sind vom Mittelpunkt aus,
+    // während pdf.text von der oberen linken Ecke ausgeht
+    const centerX = width / 2
+    const centerY = height / 2
+    
+    // Berechne die absolute Position in Punkten
+    const x = bleed + centerX + (block.x * MM_TO_PT / 10)
+    const y = bleed + centerY + (block.y * MM_TO_PT / 10)
+
+    // Füge den Text ein
+    pdf.text(block.text, x, y, {
+      align: 'center',
+      baseline: 'middle'
+    })
+  })
 
   return pdf
 }

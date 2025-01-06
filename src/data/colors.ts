@@ -7,13 +7,11 @@ export const colorPalette = {
     '#315f72',  // Dunkelblau
     '#f47bbd',  // Rosa
     '#dfe6e8',  // Hellgrau
-    '#daf2ec',  // Mint (wiederholt)
   ],
   text: [
     '#ffcce7',  // Hellrosa
     '#f57e7e',  // Lachs
     '#f4ec7b',  // Gelb
     '#f47a60',  // Orange
-    '#ffcce7',  // Hellrosa (wiederholt)
   ]
 } as const

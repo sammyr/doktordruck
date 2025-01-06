@@ -1,12 +1,12 @@
+import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'PDF Designer',
-  description: 'Ein moderner PDF-Designer mit anpassbaren Layouts',
+  title: 'Doktor Druck - Professioneller PDF Designer',
+  description: 'Erstellen Sie professionelle PDF-Dokumente mit unserem intuitiven Designer',
 }
 
 export default function RootLayout({
@@ -16,11 +16,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="de">
-      <body className={inter.className}>
-        <main className="min-h-screen bg-background">
-          {children}
-        </main>
-      </body>
+      <head>
+        <link rel="shortcut icon" href="/favicon.ico" />
+      </head>
+      <body className={inter.className}>{children}</body>
     </html>
   )
 }

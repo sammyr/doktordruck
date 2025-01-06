@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Hintergrund -->
+  <rect width="512" height="512" rx="128" fill="#4C1D95"/>
+  
+  <!-- Stethoskop -->
+  <path d="M256 96C176.5 96 112 160.5 112 240V352C112 387.3 140.7 416 176 416H336C371.3 416 400 387.3 400 352V240C400 160.5 335.5 96 256 96ZM256 144C308.6 144 352 187.4 352 240H160C160 187.4 203.4 144 256 144Z" fill="white"/>
+  
+  <!-- Dokument -->
+  <path d="M224 208H288V272H224V208ZM192 176V304H320V176H192Z" fill="#E9D5FF"/>
+</svg>
