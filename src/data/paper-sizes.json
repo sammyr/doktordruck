@@ -1,0 +1,112 @@
+{
+  "poster": {
+    "portrait": [
+      {
+        "id": "p1",
+        "name": "Poster 30x46",
+        "width": 304.8,
+        "height": 457.2,
+        "printMargins": {
+          "top": 10,
+          "right": 10,
+          "bottom": 10,
+          "left": 10
+        },
+        "bleed": 3
+      },
+      {
+        "id": "p2",
+        "name": "Poster 41x51",
+        "width": 406.4,
+        "height": 508.0,
+        "printMargins": {
+          "top": 10,
+          "right": 10,
+          "bottom": 10,
+          "left": 10
+        },
+        "bleed": 3
+      },
+      {
+        "id": "p3",
+        "name": "Poster 46x61",
+        "width": 457.2,
+        "height": 609.6,
+        "printMargins": {
+          "top": 10,
+          "right": 10,
+          "bottom": 10,
+          "left": 10
+        },
+        "bleed": 3
+      },
+      {
+        "id": "p4",
+        "name": "Poster 51x91",
+        "width": 508.0,
+        "height": 914.4,
+        "printMargins": {
+          "top": 10,
+          "right": 10,
+          "bottom": 10,
+          "left": 10
+        },
+        "bleed": 3
+      }
+    ],
+    "landscape": [
+      {
+        "id": "l1",
+        "name": "Poster 30x20",
+        "width": 304.8,
+        "height": 203.2,
+        "printMargins": {
+          "top": 10,
+          "right": 10,
+          "bottom": 10,
+          "left": 10
+        },
+        "bleed": 3
+      },
+      {
+        "id": "l2",
+        "name": "Poster 36x28",
+        "width": 355.6,
+        "height": 279.4,
+        "printMargins": {
+          "top": 10,
+          "right": 10,
+          "bottom": 10,
+          "left": 10
+        },
+        "bleed": 3
+      },
+      {
+        "id": "l3",
+        "name": "Poster 43x28",
+        "width": 431.8,
+        "height": 279.4,
+        "printMargins": {
+          "top": 10,
+          "right": 10,
+          "bottom": 10,
+          "left": 10
+        },
+        "bleed": 3
+      },
+      {
+        "id": "l4",
+        "name": "Poster 61x41",
+        "width": 609.6,
+        "height": 406.4,
+        "printMargins": {
+          "top": 10,
+          "right": 10,
+          "bottom": 10,
+          "left": 10
+        },
+        "bleed": 3
+      }
+    ]
+  }
+}
