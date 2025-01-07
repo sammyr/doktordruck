@@ -18,8 +18,8 @@ function hexToRgb(hex: string) {
 
 // Setzt die Textstile für das PDF
 function applyTextStyle(pdf: jsPDF, block: TextBlock) {
-  // Mappe die Schriftart auf eine Standard-PDF-Schriftart
-  const fontFamily = pdfSettings.fontMapping[block.fontFamily] || 'helvetica'
+  // Verwende die tatsächliche Schriftart direkt
+  const fontFamily = block.fontFamily
   const fontStyle = pdfSettings.weightMapping[block.fontWeight] || 'normal'
   
   // Setze die Schriftart
@@ -117,6 +117,7 @@ export async function generatePDF(options: PdfGeneratorOptions): Promise<Uint8Ar
     renderTextBlock(pdf, block, pageWidth, pageHeight)
   })
 
-  // PDF als ArrayBuffer zurückgeben
-  return pdf.output('arraybuffer')
+  // PDF als Uint8Array zurückgeben
+  const arrayBuffer = pdf.output('arraybuffer')
+  return new Uint8Array(arrayBuffer)
 }

@@ -4,7 +4,6 @@ import { fonts } from '@/data/fonts'
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
   SelectLabel,
   SelectTrigger,
@@ -39,18 +38,16 @@ export function TextSettings({
             <SelectValue placeholder="Wähle eine Schriftart" />
           </SelectTrigger>
           <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Schriftarten</SelectLabel>
-              {fonts.map((font) => (
-                <SelectItem
-                  key={font.family}
-                  value={font.family}
-                  style={{ fontFamily: font.family }}
-                >
-                  {font.name}
-                </SelectItem>
-              ))}
-            </SelectGroup>
+            <SelectLabel>Schriftarten</SelectLabel>
+            {fonts.map((font) => (
+              <SelectItem
+                key={font.family}
+                value={font.family}
+                style={{ fontFamily: font.family }}
+              >
+                {font.name}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>

@@ -6,7 +6,7 @@ import { FontLoader } from '@/components/FontLoader'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'PDF Design Tool',
+  title: 'Doktor Druck',
   description: 'Erstellen Sie professionelle PDF-Dokumente für den Druck',
 }
 
@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="de">
       <head>
-        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </head>
       <body className={inter.className}>
         <FontLoader />

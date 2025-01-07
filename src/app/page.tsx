@@ -1,6 +1,16 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from "@/components/ui/button"
 import { Navigation } from '@/components/Navigation'
+import { Footer } from '@/components/Footer'
+
+/**
+ * WICHTIG: KEINE LÖSCHUNGEN OHNE EXPLIZITE ANWEISUNG
+ * - Jede Komponente und Sektion wurde sorgfältig entwickelt
+ * - Auch wenn bestimmte Elemente redundant erscheinen, könnten sie für spezielle Anwendungsfälle erforderlich sein
+ * - NIEMALS Komponenten oder Sektionen entfernen, auch wenn sie scheinbar ungenutzt sind
+ * - Bei Unsicherheit IMMER nachfragen, bevor Änderungen vorgenommen werden
+ */
 
 export default function Home() {
   return (
@@ -10,21 +20,32 @@ export default function Home() {
       {/* Hero Section */}
       <section className="bg-white py-20">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-8">
-              Professionelle Druckvorlagen leicht gemacht
-            </h1>
-            <p className="text-xl text-gray-600 mb-8">
-              Erstellen Sie druckreife PDF-Dokumente mit perfekter Qualität. 
-              Ideal für Druckereien, Designer und alle, die hochwertige Druckvorlagen benötigen.
-            </p>
-            <div className="flex justify-center space-x-4">
-              <Link
-                href="/druck"
-                className="bg-purple-800 text-white px-8 py-3 rounded-lg hover:bg-purple-900 transition-colors"
-              >
-                Jetzt PDF erstellen
-              </Link>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div className="text-left">
+              <h1 className="text-4xl font-bold text-gray-900 mb-8">
+                Professionelle Druckvorlagen leicht gemacht
+              </h1>
+              <p className="text-xl text-gray-600 mb-8">
+                Erstellen Sie druckreife PDF-Dokumente mit perfekter Qualität. 
+                Ideal für Druckereien, Designer und alle, die hochwertige Druckvorlagen benötigen.
+              </p>
+              <div className="flex space-x-4">
+                <Link
+                  href="/druck"
+                  className="bg-purple-800 text-white px-8 py-3 rounded-lg hover:bg-purple-900 transition-colors"
+                >
+                  Jetzt PDF erstellen
+                </Link>
+              </div>
+            </div>
+            <div className="relative h-[400px] rounded-lg overflow-hidden shadow-xl">
+              <Image
+                src="/footage/editor-preview.png"
+                alt="PDF Editor Vorschau"
+                fill
+                className="object-contain bg-gray-100"
+                priority
+              />
             </div>
           </div>
         </div>
@@ -36,8 +57,16 @@ export default function Home() {
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
             Professionelle Funktionen
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-lg shadow-lg">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-white p-4 rounded-lg shadow-lg">
+              <div className="relative h-48 mb-4 rounded-lg overflow-hidden">
+                <Image
+                  src="/footage/print-settings.png"
+                  alt="Druckoptimierte Ausgabe"
+                  fill
+                  className="object-contain bg-gray-100"
+                />
+              </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">
                 Druckoptimierte Ausgabe
               </h3>
@@ -46,22 +75,38 @@ export default function Home() {
                 für professionelle Druckergebnisse.
               </p>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-lg">
+            <div className="bg-white p-4 rounded-lg shadow-lg">
+              <div className="relative h-48 mb-4 rounded-lg overflow-hidden">
+                <Image
+                  src="/footage/text-editing.png"
+                  alt="Präzise Textbearbeitung"
+                  fill
+                  className="object-contain bg-gray-100"
+                />
+              </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">
                 Präzise Textbearbeitung
               </h3>
               <p className="text-gray-600">
-                Umfangreiche Schriftbibliothek, Kerning-Kontrolle und 
-                vektorbasierte Texte für gestochen scharfe Ergebnisse.
+                Umfangreiche Textformatierung mit verschiedenen Schriftarten, 
+                Größen und Stilen für perfekte Typografie.
               </p>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-lg">
+            <div className="bg-white p-4 rounded-lg shadow-lg">
+              <div className="relative h-48 mb-4 rounded-lg overflow-hidden">
+                <Image
+                  src="/footage/export-options.png"
+                  alt="Flexible Export-Optionen"
+                  fill
+                  className="object-contain bg-gray-100"
+                />
+              </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                Druckerei-Standards
+                Flexible Export-Optionen
               </h3>
               <p className="text-gray-600">
-                PDF/X-konform, eingebettete Schriften und ICC-Profile 
-                für reibungslose Druckabläufe.
+                Speichern Sie Ihre Dokumente im druckfertigen PDF-Format oder 
+                als bearbeitbare Projektdatei.
               </p>
             </div>
           </div>
@@ -193,49 +238,26 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="container mx-auto px-4 py-16 text-center">
-        <h2 className="text-3xl font-bold mb-6">
-          Bereit für professionelle Druckvorlagen?
-        </h2>
-        <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-          Starten Sie jetzt und erstellen Sie druckreife PDFs 
-          in Ihrem Browser - schnell, einfach und professionell.
-        </p>
-        <Link href="/druck">
-          <Button size="lg" className="bg-purple-800 hover:bg-purple-900 text-white">
-            Kostenlos testen
-          </Button>
-        </Link>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <section className="bg-purple-800 text-white py-20">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <h3 className="text-xl font-bold mb-4">Über uns</h3>
-              <p className="text-gray-400">
-                Wir sind spezialisiert auf die Entwicklung von Tools für die professionelle Druckvorstufe.
-              </p>
-            </div>
-            <div>
-              <h3 className="text-xl font-bold mb-4">Rechtliches</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="/impressum" className="text-gray-400 hover:text-white transition-colors">
-                    Impressum
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/datenschutz" className="text-gray-400 hover:text-white transition-colors">
-                    Datenschutz
-                  </Link>
-                </li>
-              </ul>
-            </div>
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-3xl font-bold mb-8">
+              Bereit für professionelle Druckvorlagen?
+            </h2>
+            <p className="text-xl mb-8">
+              Starten Sie jetzt und erstellen Sie Ihre erste druckfertige PDF-Datei.
+            </p>
+            <Link
+              href="/druck"
+              className="inline-block bg-white text-purple-800 px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              Kostenlos ausprobieren
+            </Link>
           </div>
         </div>
-      </footer>
+      </section>
+
+      <Footer />
     </div>
   )
 }

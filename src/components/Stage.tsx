@@ -16,10 +16,11 @@ interface StageProps {
   fontFamily: string
   fontSize: number
   fontStyle: string
+  fontWeight: string | number
   pageSize: string
   textBlocks: TextBlock[]
   onTextBlockUpdate: (block: TextBlock) => void
-  onTextBlockSelect: (id: string | null) => void
+  onTextBlockSelect: (id: string) => void
   onAddTextBlock: () => void
 }
 
@@ -28,6 +29,7 @@ export function Stage({
   fontFamily,
   fontSize,
   fontStyle,
+  fontWeight,
   pageSize,
   textBlocks,
   onTextBlockUpdate,
@@ -35,7 +37,7 @@ export function Stage({
   onAddTextBlock
 }: StageProps) {
   const stageRef = useRef<HTMLDivElement>(null)
-  const [scale, setScale] = useState(stageSettings.zoom.initial)
+  const [scale, setScale] = useState<number>(1.8)
   const [selectedText, setSelectedText] = useState<string | null>(null)
   const [editingText, setEditingText] = useState<string | null>(null)
   const [isDragging, setIsDragging] = useState(false)
@@ -103,7 +105,7 @@ export function Stage({
     const textElement = document.createElement('span')
     textElement.style.fontFamily = block.fontFamily
     textElement.style.fontSize = `${block.fontSize}px`
-    textElement.style.fontWeight = block.fontWeight
+    textElement.style.fontWeight = String(block.fontWeight)
     textElement.style.fontStyle = block.fontStyle || 'normal'
     textElement.innerText = block.text
     document.body.appendChild(textElement)
@@ -318,7 +320,7 @@ export function Stage({
                 color: block.color,
                 fontFamily: block.fontFamily,
                 fontSize: `${block.fontSize}px`,
-                fontWeight: Number(block.fontWeight),
+                fontWeight: String(block.fontWeight),
                 fontStyle: (block.fontStyle || '').includes('italic') ? 'italic' : 'normal',
                 userSelect: 'none',
                 transform: 'translate(-50%, -50%)',
