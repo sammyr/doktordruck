@@ -1,3 +1,4 @@
 {
+  "/not-found": "app/not-found.js",
   "/druck/page": "app/druck/page.js"
 }

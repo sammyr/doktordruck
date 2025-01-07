@@ -94,34 +94,34 @@ export default function DruckPage() {
   }, [])
 
   const handleAddTextBlock = useCallback(() => {
-    const allPaperSizes = [...paperSizes.poster.portrait, ...paperSizes.poster.landscape]
-    const currentSize = allPaperSizes.find(size => size.id === pageSize) || paperSizes.poster.portrait[0]
-    
-    const blockWidth = 100
-    const blockHeight = 30
-    
     const newBlock: TextBlock = {
-      id: uuidv4(),
+      id: Math.random().toString(36).substr(2, 9),
       text: 'Neuer Text',
-      x: 50, 
-      y: 50, 
-      fontSize,
+      x: 50,
+      y: 50,
+      color: '#FFCCE7',
       fontFamily,
-      fontStyle,
+      fontSize,
       fontWeight,
-      color: '#000000',
-      selected: false,
-      width: blockWidth,
-      height: blockHeight,
-      zIndex: textBlocks.length
+      fontStyle,
+      width: 100,
+      height: 30,
+      zIndex: textBlocks.length,
+      textAlign: 'center',
+      lineHeight: 1.2,
+      letterSpacing: 0,
+      multiline: false
     }
-    
-    setTextBlocks(prev => [...prev, newBlock])
-  }, [pageSize, fontSize, fontFamily, fontStyle, fontWeight, textBlocks.length])
+    setTextBlocks([...textBlocks, newBlock])
+  }, [textBlocks, fontFamily, fontSize, fontWeight, fontStyle])
 
   const handleDeleteTextBlock = useCallback((id: string) => {
     setTextBlocks(prev => prev.filter(block => block.id !== id))
     setSelectedBlockId(null)
+  }, [])
+
+  const handleGeneratePDF = useCallback(() => {
+    // Implement PDF generation logic here
   }, [])
 
   // Aktualisiere die Schriftart für den ausgewählten Block
@@ -172,7 +172,12 @@ export default function DruckPage() {
     <div className="flex h-screen">
       <div className="relative flex flex-col" style={{ width: `${100 - stageWidth}%` }}>
         <div className="sticky top-0 z-50 bg-background border-b">
-          <PrintMenubar />
+          <PrintMenubar 
+            backgroundColor={backgroundColor}
+            pageSize={pageSize}
+            textBlocks={textBlocks}
+            onGeneratePDF={handleGeneratePDF}
+          />
         </div>
         <Stage
           backgroundColor={backgroundColor}

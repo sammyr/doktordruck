@@ -7,12 +7,13 @@ export interface TextBlock {
   fontFamily: string
   fontSize: number
   fontWeight: string | number
-  fontStyle?: string
+  fontStyle: string
   selected?: boolean
-  zIndex: number
-  multiline?: boolean      // Ob der Text mehrzeilig ist
   width?: number          // Breite der Textbox in Prozent
-  lineHeight: number     // Zeilenhöhe als Faktor
+  height?: number         // Höhe der Textbox in Prozent
+  zIndex: number
   textAlign?: 'left' | 'center' | 'right'  // Textausrichtung
-  letterSpacing: number  // Buchstabenabstand in Pixel
+  lineHeight?: number     // Zeilenhöhe als Faktor (optional)
+  letterSpacing?: number  // Buchstabenabstand in Pixel (optional)
+  multiline?: boolean     // Ob der Text mehrzeilig ist (optional)
 }

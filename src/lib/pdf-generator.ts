@@ -6,28 +6,67 @@ import paperSizes from '@/data/paper-sizes.json'
 import { TextBlock } from '@/types/text'
 import { pdfSettings } from '@/config/settings'
 
-// Standard-Schriftarten-Mapping
-// const fontMapping: { [key: string]: string } = {
-//   'Inter': 'helvetica',
-//   'Roboto': 'helvetica',
-//   'Playfair Display': 'times',
-//   'Arial': 'helvetica',
-//   'Times New Roman': 'times',
-//   'Courier New': 'courier'
-// }
+// Konvertiert Hex-Farbe in RGB
+function hexToRgb(hex: string) {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : { r: 255, g: 255, b: 255 }
+}
 
-// Gewicht-Mapping
-// const weightMapping: { [key: number]: string } = {
-//   100: 'normal',
-//   200: 'normal',
-//   300: 'normal',
-//   400: 'normal',
-//   500: 'normal',
-//   600: 'bold',
-//   700: 'bold',
-//   800: 'bold',
-//   900: 'bold'
-// }
+// Setzt die Textstile für das PDF
+function applyTextStyle(pdf: jsPDF, block: TextBlock) {
+  // Mappe die Schriftart auf eine Standard-PDF-Schriftart
+  const fontFamily = pdfSettings.fontMapping[block.fontFamily] || 'helvetica'
+  const fontStyle = pdfSettings.weightMapping[block.fontWeight] || 'normal'
+  
+  // Setze die Schriftart
+  pdf.setFont(fontFamily, fontStyle)
+  
+  // Schriftgrößenberechnung mit Skalierungsfaktor aus den Einstellungen
+  const fontSize = Math.round(block.fontSize * pdfSettings.fontScaleFactor)
+  pdf.setFontSize(fontSize)
+  
+  // Setze die Textfarbe
+  const textColor = hexToRgb(block.color)
+  pdf.setTextColor(textColor.r, textColor.g, textColor.b)
+  
+  // Setze den Buchstabenabstand, falls vorhanden
+  if (block.letterSpacing) {
+    pdf.setCharSpace(block.letterSpacing)
+  }
+  
+  // Setze die Zeilenhöhe, falls vorhanden
+  if (block.lineHeight) {
+    pdf.setLineHeightFactor(block.lineHeight)
+  }
+}
+
+// Berechnet die Position für den Text
+function calculateTextPosition(block: TextBlock, pageWidth: number, pageHeight: number) {
+  return {
+    x: (block.x / 100) * pageWidth,
+    y: (block.y / 100) * pageHeight
+  }
+}
+
+// Rendert einen Textblock im PDF
+function renderTextBlock(pdf: jsPDF, block: TextBlock, pageWidth: number, pageHeight: number) {
+  // Wende Textstile an
+  applyTextStyle(pdf, block)
+  
+  // Berechne Position
+  const { x, y } = calculateTextPosition(block, pageWidth, pageHeight)
+  
+  // Text einfügen
+  pdf.text(block.text, x, y, {
+    align: 'center',
+    baseline: 'middle',
+    maxWidth: pageWidth - (pdfSettings.minMargin * 2)
+  })
+}
 
 interface PdfGeneratorOptions {
   pageSize: string
@@ -47,7 +86,7 @@ export async function generatePDF(options: PdfGeneratorOptions): Promise<Uint8Ar
   // Extrahiere die Maße
   const { width, height } = selectedSize
   const orientation = options.pageSize.startsWith('l') ? 'landscape' : 'portrait'
-  const { bleed, fontMapping, weightMapping, fontScaleFactor, minMargin } = pdfSettings
+  const { bleed } = pdfSettings
 
   // Erstelle PDF
   const pdf = new jsPDF({
@@ -60,15 +99,6 @@ export async function generatePDF(options: PdfGeneratorOptions): Promise<Uint8Ar
   })
 
   // Setze Hintergrundfarbe
-  const hexToRgb = (hex: string) => {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-    return result ? {
-      r: parseInt(result[1], 16),
-      g: parseInt(result[2], 16),
-      b: parseInt(result[3], 16)
-    } : { r: 255, g: 255, b: 255 }
-  }
-
   const bgColor = hexToRgb(options.backgroundColor)
   pdf.setFillColor(bgColor.r, bgColor.g, bgColor.b)
   pdf.rect(
@@ -80,39 +110,13 @@ export async function generatePDF(options: PdfGeneratorOptions): Promise<Uint8Ar
   )
 
   // Füge alle Textblöcke ein
+  const pageWidth = width + (bleed * 2)
+  const pageHeight = height + (bleed * 2)
+  
   options.content.forEach(block => {
-    // Mappe die Schriftart auf eine Standard-PDF-Schriftart
-    const fontFamily = fontMapping[block.fontFamily] || 'helvetica'
-    const fontStyle = weightMapping[block.fontWeight] || 'normal'
-    
-    // Setze die Schriftart
-    pdf.setFont(fontFamily, fontStyle)
-    
-    // Schriftgrößenberechnung mit Skalierungsfaktor aus den Einstellungen
-    const fontSize = Math.round(block.fontSize * fontScaleFactor)
-    pdf.setFontSize(fontSize)
-
-    // Setze die Textfarbe
-    const textColor = hexToRgb(block.color)
-    pdf.setTextColor(textColor.r, textColor.g, textColor.b)
-
-    // Berechne die Position
-    const pageWidth = width + (bleed * 2)
-    const pageHeight = height + (bleed * 2)
-    
-    // Berechne die absolute Position in mm
-    const posX = (block.x / 100) * pageWidth
-    const posY = (block.y / 100) * pageHeight
-
-    // Text einfügen
-    pdf.text(block.text, posX, posY, {
-      align: 'center',
-      baseline: 'middle',
-      maxWidth: pageWidth - (minMargin * 2) // Berücksichtige Mindestrand
-    })
+    renderTextBlock(pdf, block, pageWidth, pageHeight)
   })
 
   // PDF als ArrayBuffer zurückgeben
-  const arrayBuffer = pdf.output('arraybuffer')
-  return new Uint8Array(arrayBuffer)
+  return pdf.output('arraybuffer')
 }

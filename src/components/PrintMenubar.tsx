@@ -1,3 +1,5 @@
+'use client'
+
 import {
   Menubar,
   MenubarContent,
@@ -7,8 +9,36 @@ import {
   MenubarShortcut,
   MenubarTrigger,
 } from "@/components/ui/menubar"
+import { saveProject } from '@/lib/project-manager'
+import { TextBlock } from '@/types/text'
 
-export function PrintMenubar() {
+interface PrintMenubarProps {
+  backgroundColor: string
+  pageSize: string
+  textBlocks: TextBlock[]
+  onGeneratePDF: () => void
+}
+
+export function PrintMenubar({
+  backgroundColor,
+  pageSize,
+  textBlocks,
+  onGeneratePDF
+}: PrintMenubarProps) {
+  const handleSave = async () => {
+    try {
+      await saveProject({
+        version: '1.0.0',
+        pageSize,
+        backgroundColor,
+        textBlocks
+      })
+    } catch (error) {
+      console.error('Fehler beim Speichern:', error)
+      // Hier könnte eine Benutzerbenachrichtigung eingefügt werden
+    }
+  }
+
   return (
     <Menubar className="rounded-none border-0 border-b shadow-sm">
       <MenubarMenu>
@@ -21,10 +51,10 @@ export function PrintMenubar() {
             Öffnen <MenubarShortcut>⌘O</MenubarShortcut>
           </MenubarItem>
           <MenubarSeparator />
-          <MenubarItem>
+          <MenubarItem onClick={handleSave}>
             Speichern <MenubarShortcut>⌘S</MenubarShortcut>
           </MenubarItem>
-          <MenubarItem>Als PDF exportieren...</MenubarItem>
+          <MenubarItem onClick={onGeneratePDF}>Als PDF exportieren...</MenubarItem>
         </MenubarContent>
       </MenubarMenu>
 
@@ -61,6 +91,5 @@ export function PrintMenubar() {
         </MenubarContent>
       </MenubarMenu>
     </Menubar>
-
   )
 }
