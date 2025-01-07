@@ -1,49 +1,66 @@
+'use client'
+
 import { Button } from "@/components/ui/button"
-import { Bold, Italic, Type } from 'lucide-react'
+import { Italic, AlignLeft, AlignCenter, AlignRight } from 'lucide-react'
 
 interface FontStyleButtonsProps {
-  value: string
-  onChange: (value: string) => void
+  fontStyle: string
+  setFontStyle: (style: string) => void
+  textAlign: 'left' | 'center' | 'right'
+  setTextAlign: (align: 'left' | 'center' | 'right') => void
   disabled?: boolean
 }
 
-export function FontStyleButtons({ 
-  value, 
-  onChange, 
-  disabled = false 
+export function FontStyleButtons({
+  fontStyle,
+  setFontStyle,
+  textAlign,
+  setTextAlign,
+  disabled = false
 }: FontStyleButtonsProps) {
+  const isItalic = fontStyle.includes('italic')
+
   return (
-    <div className="flex gap-1">
+    <div className="flex gap-2">
       <Button
-        variant={value === 'normal' ? 'default' : 'outline'}
+        variant={isItalic ? 'default' : 'outline'}
         size="icon"
-        onClick={() => onChange('normal')}
+        onClick={() => setFontStyle(isItalic ? 'normal' : 'italic')}
         disabled={disabled}
-        className="h-12 w-12"
-        title="Normale Schrift"
-      >
-        <Type className="h-4 w-4" />
-      </Button>
-      <Button
-        variant={value === 'bold' ? 'default' : 'outline'}
-        size="icon"
-        onClick={() => onChange('bold')}
-        disabled={disabled}
-        className="h-12 w-12 font-black"
-        title="Fett"
-      >
-        <Bold className="h-5 w-5" />
-      </Button>
-      <Button
-        variant={value === 'italic' ? 'default' : 'outline'}
-        size="icon"
-        onClick={() => onChange('italic')}
-        disabled={disabled}
-        className="h-12 w-12"
-        title="Kursiv"
+        className="h-9 w-9"
       >
         <Italic className="h-4 w-4" />
       </Button>
+
+      <div className="flex border rounded-md">
+        <Button
+          variant={textAlign === 'left' ? 'default' : 'ghost'}
+          size="icon"
+          onClick={() => setTextAlign('left')}
+          disabled={disabled}
+          className="h-9 w-9 rounded-r-none"
+        >
+          <AlignLeft className="h-4 w-4" />
+        </Button>
+        <Button
+          variant={textAlign === 'center' ? 'default' : 'ghost'}
+          size="icon"
+          onClick={() => setTextAlign('center')}
+          disabled={disabled}
+          className="h-9 w-9 rounded-none border-l border-r"
+        >
+          <AlignCenter className="h-4 w-4" />
+        </Button>
+        <Button
+          variant={textAlign === 'right' ? 'default' : 'ghost'}
+          size="icon"
+          onClick={() => setTextAlign('right')}
+          disabled={disabled}
+          className="h-9 w-9 rounded-l-none"
+        >
+          <AlignRight className="h-4 w-4" />
+        </Button>
+      </div>
     </div>
   )
 }

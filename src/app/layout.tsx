@@ -1,12 +1,13 @@
-import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import './globals.css'
+import { FontLoader } from '@/components/FontLoader'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Doktor Druck - Professioneller PDF Designer',
-  description: 'Erstellen Sie professionelle PDF-Dokumente mit unserem intuitiven Designer',
+  title: 'PDF Design Tool',
+  description: 'Erstellen Sie professionelle PDF-Dokumente für den Druck',
 }
 
 export default function RootLayout({
@@ -19,7 +20,10 @@ export default function RootLayout({
       <head>
         <link rel="shortcut icon" href="/favicon.ico" />
       </head>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <FontLoader />
+        {children}
+      </body>
     </html>
   )
 }

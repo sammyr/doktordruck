@@ -6,15 +6,21 @@ import * as PopoverPrimitive from "@radix-ui/react-popover"
 import { HexColorPicker } from "react-colorful"
 import { cn } from "@/lib/utils"
 
-interface ColorPickerProps {
-  color: string
-  onChange: (color: string) => void
-  className?: string
-  label?: string
+export interface ColorPickerProps {
+  color: string;
+  onChange: (color: string) => void;
+  label: string;
+  disabled?: boolean;
 }
 
-export function ColorPicker({ color, onChange, className, label }: ColorPickerProps) {
+export function ColorPicker({ color, onChange, label, disabled = false }: ColorPickerProps) {
   const [isOpen, setIsOpen] = React.useState(false)
+  const [selectedColor, setSelectedColor] = React.useState(color)
+
+  const handleColorChange = (color: string) => {
+    setSelectedColor(color)
+    onChange(color)
+  }
 
   return (
     <PopoverPrimitive.Root open={isOpen} onOpenChange={setIsOpen}>
@@ -22,10 +28,11 @@ export function ColorPicker({ color, onChange, className, label }: ColorPickerPr
         <button
           className={cn(
             "w-12 h-10 rounded-md border border-input shadow-sm",
-            className
+            disabled ? "opacity-50 cursor-not-allowed" : ""
           )}
-          style={{ backgroundColor: color }}
+          style={{ backgroundColor: selectedColor }}
           aria-label={label || "Wähle eine Farbe"}
+          disabled={disabled}
         />
       </PopoverPrimitive.Trigger>
       <PopoverPrimitive.Portal>
@@ -34,16 +41,16 @@ export function ColorPicker({ color, onChange, className, label }: ColorPickerPr
           sideOffset={5}
         >
           <div className="space-y-4">
-            <HexColorPicker color={color} onChange={onChange} />
+            <HexColorPicker color={selectedColor} onChange={handleColorChange} />
             <div className="flex items-center space-x-2">
               <div
                 className="w-8 h-8 rounded border"
-                style={{ backgroundColor: color }}
+                style={{ backgroundColor: selectedColor }}
               />
               <input
                 type="text"
-                value={color}
-                onChange={(e) => onChange(e.target.value)}
+                value={selectedColor}
+                onChange={(e) => handleColorChange(e.target.value)}
                 className="flex-1 px-2 py-1 text-sm border rounded"
                 spellCheck={false}
               />

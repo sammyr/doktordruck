@@ -6,6 +6,7 @@
 
 import { useState, useCallback } from 'react'
 import { TextBlock } from '@/types/text'
+import { stageSettings } from '@/config/settings'
 
 interface DragAndDropState {
   isDragging: boolean
@@ -56,16 +57,19 @@ export function useDragAndDrop(
       })
     } else if (activeBlock && onTextBlockUpdate) {
       e.preventDefault()
-      const deltaX = (e.clientX - dragStartPos.x) / scale
-      const deltaY = (e.clientY - dragStartPos.y) / scale
 
+      // Berechne die Mausbewegung
+      const deltaX = e.clientX - dragStartPos.x
+      const deltaY = e.clientY - dragStartPos.y
+
+      // Berechne die neue Position direkt in Prozent
       onTextBlockUpdate({
         ...activeBlock,
-        x: elementStartPos.x + deltaX,
-        y: elementStartPos.y + deltaY
+        x: elementStartPos.x + (deltaX / scale),
+        y: elementStartPos.y + (deltaY / scale)
       })
     }
-  }, [isDragging, dragStart, activeBlock, dragStartPos, elementStartPos, scale, onTextBlockUpdate])
+  }, [isDragging, dragStart, activeBlock, dragStartPos, elementStartPos, onTextBlockUpdate, scale])
 
   const handleMouseUp = useCallback(() => {
     setIsDragging(false)

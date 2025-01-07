@@ -1,3 +1,10 @@
+'use client'
+
+// !!! WICHTIG: Diese Komponente ist für die Textformatierung zuständig !!!
+// !!! Die Schriftart-Auswahl (Select) darf NICHT verändert werden !!!
+// !!! Die Schriftgrößen-Steuerung (NumberStepper) darf NICHT verändert werden !!!
+// !!! Die Schriftgrößen-Einstellungen (Initialwert 35, Schrittweite 10) dürfen NICHT geändert werden !!!
+
 import { Button } from "@/components/ui/button"
 import { Type, Trash2 } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -6,6 +13,7 @@ import { NumberStepper } from "@/components/ui/number-stepper"
 import { TextBlock } from "@/types/text"
 import { TextColorPicker } from "./text-color-picker"
 import { FontStyleButtons } from "./font-style-buttons"
+import { fonts } from '@/data/fonts'
 
 interface TextControlsProps {
   selectedBlockId: string | null
@@ -19,6 +27,8 @@ interface TextControlsProps {
   setFontSize: (size: number) => void
   fontStyle: string
   setFontStyle: (style: string) => void
+  fontWeight: number
+  setFontWeight: (weight: number) => void
 }
 
 export function TextControls({
@@ -32,9 +42,21 @@ export function TextControls({
   fontSize,
   setFontSize,
   fontStyle,
-  setFontStyle
+  setFontStyle,
+  fontWeight,
+  setFontWeight,
 }: TextControlsProps) {
   const selectedBlock = textBlocks.find(block => block.id === selectedBlockId)
+  const selectedFont = fonts.find(font => font.family === fontFamily)
+
+  const handleLineHeightChange = (value: number) => {
+    if (selectedBlock) {
+      onTextBlockUpdate({
+        ...selectedBlock,
+        lineHeight: value
+      })
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -64,50 +86,126 @@ export function TextControls({
 
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="fontFamily">Schriftart</Label>
-          <Select 
-            value={fontFamily} 
+          <Label>Schriftart</Label>
+          <Select
+            value={fontFamily}
             onValueChange={setFontFamily}
             disabled={!selectedBlockId}
           >
-            <SelectTrigger className="h-12">
+            <SelectTrigger>
               <SelectValue placeholder="Wähle eine Schriftart" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Inter">Inter</SelectItem>
-              <SelectItem value="Arial">Arial</SelectItem>
-              <SelectItem value="Times New Roman">Times New Roman</SelectItem>
+              {fonts.map((font) => (
+                <SelectItem
+                  key={font.family}
+                  value={font.family}
+                  style={{ fontFamily: font.family }}
+                >
+                  {font.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="fontSize">Schriftgröße</Label>
-          <div className="flex items-center gap-4">
+          <Label>Schriftgewicht</Label>
+          <Select
+            value={fontWeight?.toString()}
+            onValueChange={(value) => setFontWeight(Number(value))}
+            disabled={!selectedBlockId || !selectedFont}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Wähle ein Schriftgewicht" />
+            </SelectTrigger>
+            <SelectContent>
+              {selectedFont?.weights.map((weight) => (
+                <SelectItem
+                  key={weight.value}
+                  value={weight.value.toString()}
+                  style={{ fontFamily: fontFamily, fontWeight: weight.value }}
+                >
+                  {weight.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="grid grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label>Schriftgröße</Label>
             <NumberStepper
               value={fontSize}
               onChange={setFontSize}
+              min={10}
+              max={150}
+              step={10}
               disabled={!selectedBlockId}
-              textBlocks={textBlocks}
-              selectedBlockId={selectedBlockId}
-              onTextBlockUpdate={onTextBlockUpdate}
             />
+          </div>
 
-            <div className="flex-1">
-              <FontStyleButtons
-                value={fontStyle}
-                onChange={setFontStyle}
-                disabled={!selectedBlockId}
-              />
-            </div>
+          <div className="space-y-2">
+            <Label>Zeilenhöhe</Label>
+            <NumberStepper
+              value={selectedBlock?.lineHeight || 1.2}
+              onChange={handleLineHeightChange}
+              min={0.1}
+              max={5}
+              step={0.1}
+              disabled={!selectedBlockId}
+              decimalPlaces={1}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Buchstabenabstand</Label>
+            <NumberStepper
+              value={selectedBlock?.letterSpacing || 0}
+              onChange={(value) => {
+                if (selectedBlock) {
+                  onTextBlockUpdate({
+                    ...selectedBlock,
+                    letterSpacing: value
+                  })
+                }
+              }}
+              min={-5}
+              max={20}
+              step={0.1}
+              disabled={!selectedBlockId}
+              decimalPlaces={1}
+            />
           </div>
         </div>
 
-        <TextColorPicker
-          selectedBlock={selectedBlock}
-          selectedBlockId={selectedBlockId}
-          onTextBlockUpdate={onTextBlockUpdate}
-        />
+        <div className="space-y-2">
+          <Label>Schriftstil & Ausrichtung</Label>
+          <FontStyleButtons
+            fontStyle={fontStyle}
+            setFontStyle={setFontStyle}
+            textAlign={selectedBlock?.textAlign || 'left'}
+            setTextAlign={(align) => {
+              if (selectedBlock) {
+                onTextBlockUpdate({
+                  ...selectedBlock,
+                  textAlign: align
+                })
+              }
+            }}
+            disabled={!selectedBlockId}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label>Textfarbe</Label>
+          <TextColorPicker
+            selectedBlock={selectedBlock}
+            onTextBlockUpdate={onTextBlockUpdate}
+            disabled={!selectedBlockId}
+          />
+        </div>
       </div>
     </div>
   )

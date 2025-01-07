@@ -9,6 +9,7 @@ import paperSizes from '@/data/paper-sizes.json'
 import { ZoomIn, ZoomOut, RotateCcw, Type } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useDragAndDrop } from '@/hooks/useDragAndDrop'
+import { stageSettings } from '@/config/settings'
 
 interface StageProps {
   backgroundColor: string
@@ -34,65 +35,204 @@ export function Stage({
   onAddTextBlock
 }: StageProps) {
   const stageRef = useRef<HTMLDivElement>(null)
-  const [scale, setScale] = useState(1)
+  const [scale, setScale] = useState(stageSettings.zoom.initial)
   const [selectedText, setSelectedText] = useState<string | null>(null)
   const [editingText, setEditingText] = useState<string | null>(null)
-
-  const {
-    state: { isDragging, position },
-    handleMouseDown,
-    handleMouseMove,
-    handleMouseUp,
-    setPosition
-  } = useDragAndDrop(scale, onTextBlockUpdate)
-
-  // Finde die Seitengröße aus der JSON-Datei
-  const posterSize = [
-    ...paperSizes.poster.portrait,
-    ...paperSizes.poster.landscape
-  ].find(size => size.id === pageSize)
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
+  const [activeBlock, setActiveBlock] = useState<TextBlock | null>(null)
+  const [dragStartPos, setDragStartPos] = useState({ x: 0, y: 0 })
+  const [elementStartPos, setElementStartPos] = useState({ x: 0, y: 0 })
+  const [position, setPosition] = useState({ x: 0, y: 0 })
+  const [showCenterGuide, setShowCenterGuide] = useState(false)
+  const [guidePosition, setGuidePosition] = useState<{ x: number, y: number } | null>(null)
 
   const handleWheel = useCallback((e: React.WheelEvent<HTMLDivElement>) => {
-    if (e.ctrlKey) {
-      e.preventDefault()
-      e.stopPropagation()
-      
-      const scaleFactor = 0.05
-      const delta = e.deltaY < 0 ? scaleFactor : -scaleFactor
-      
-      setScale(prevScale => {
-        const newScale = Math.min(5, Math.max(0.1, prevScale + delta))
-        return Number(newScale.toFixed(2))
-      })
+    e.preventDefault()
+    
+    // Wenn mittlere Maustaste gedrückt ist, verschieben statt zoomen
+    if (isDragging) {
+      return
     }
-  }, [])
+    
+    const baseStep = stageSettings.zoom.step
+    const speedMultiplier = stageSettings.zoom.speed.wheel
+    const delta = e.deltaY < 0 ? baseStep * speedMultiplier : -baseStep * speedMultiplier
+    
+    setScale(prevScale => {
+      const newScale = Math.min(stageSettings.zoom.max, Math.max(stageSettings.zoom.min, prevScale + delta))
+      return Number(newScale.toFixed(2))
+    })
+  }, [isDragging])
 
   useEffect(() => {
     const preventDefault = (e: WheelEvent) => {
-      if (e.ctrlKey) {
-        e.preventDefault()
-      }
+      e.preventDefault()
     }
 
-    // Event-Listener für das Dokument hinzufügen
     document.addEventListener('wheel', preventDefault, { passive: false })
 
-    // Aufräumen beim Unmount
     return () => {
       document.removeEventListener('wheel', preventDefault)
     }
   }, [])
 
+  const handleMouseDown = useCallback((e: React.MouseEvent, block: TextBlock | null) => {
+    if (e.button === 1) { // Mittlere Maustaste
+      e.preventDefault()
+      setIsDragging(true)
+      setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y })
+    } else if (block) {
+      setActiveBlock(block)
+      setDragStartPos({ x: e.clientX, y: e.clientY })
+      setElementStartPos({ x: block.x, y: block.y })
+    }
+  }, [position])
+
+  const snapToGrid = useCallback((value: number) => {
+    const gridSize = stageSettings.dragAndDrop.grid.size
+    return Math.round(value / gridSize) * gridSize
+  }, [])
+
+  const checkCenterGuide = useCallback((x: number, y: number, block: TextBlock) => {
+    const threshold = stageSettings.dragAndDrop.grid.snapThreshold / scale
+    const centerX = 50 // Mitte horizontal
+    const centerY = 50 // Mitte vertikal
+    
+    // Berechne die Textbox-Dimensionen
+    const textElement = document.createElement('span')
+    textElement.style.fontFamily = block.fontFamily
+    textElement.style.fontSize = `${block.fontSize}px`
+    textElement.style.fontWeight = block.fontWeight
+    textElement.style.fontStyle = block.fontStyle || 'normal'
+    textElement.innerText = block.text
+    document.body.appendChild(textElement)
+    
+    // Hole die Breite und Höhe der Textbox
+    const textWidth = textElement.offsetWidth
+    const textHeight = textElement.offsetHeight
+    document.body.removeChild(textElement)
+    
+    // Konvertiere die Pixel-Dimensionen in Prozent der Stage
+    const stageElement = stageRef.current
+    if (!stageElement) return { x, y }
+    
+    const stageRect = stageElement.getBoundingClientRect()
+    const textWidthPercent = (textWidth / stageRect.width) * 100
+    const textHeightPercent = (textHeight / stageRect.height) * 100
+    
+    // Berechne die Ränder der Textbox
+    const leftEdge = x - textWidthPercent / 2
+    const rightEdge = x + textWidthPercent / 2
+    const topEdge = y - textHeightPercent / 2
+    const bottomEdge = y + textHeightPercent / 2
+    
+    // Prüfe, ob eine der Kanten nahe der Mitte ist
+    const showX = Math.abs(leftEdge - centerX) < threshold || 
+                 Math.abs(rightEdge - centerX) < threshold ||
+                 Math.abs(x - centerX) < threshold
+    
+    const showY = Math.abs(topEdge - centerY) < threshold ||
+                 Math.abs(bottomEdge - centerY) < threshold ||
+                 Math.abs(y - centerY) < threshold
+    
+    setShowCenterGuide(showX || showY)
+    
+    // Berechne die eingerastete Position
+    let snappedX = x
+    let snappedY = y
+    
+    if (showX) {
+      if (Math.abs(leftEdge - centerX) < threshold) {
+        snappedX = centerX + textWidthPercent / 2
+      } else if (Math.abs(rightEdge - centerX) < threshold) {
+        snappedX = centerX - textWidthPercent / 2
+      } else if (Math.abs(x - centerX) < threshold) {
+        snappedX = centerX
+      }
+    }
+    
+    if (showY) {
+      if (Math.abs(topEdge - centerY) < threshold) {
+        snappedY = centerY + textHeightPercent / 2
+      } else if (Math.abs(bottomEdge - centerY) < threshold) {
+        snappedY = centerY - textHeightPercent / 2
+      } else if (Math.abs(y - centerY) < threshold) {
+        snappedY = centerY
+      }
+    }
+    
+    setGuidePosition({ 
+      x: showX ? centerX : null,
+      y: showY ? centerY : null
+    })
+    
+    return {
+      x: snappedX,
+      y: snappedY
+    }
+  }, [scale, stageRef])
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (isDragging) {
+      e.preventDefault()
+      setPosition({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y
+      })
+    } else if (activeBlock && onTextBlockUpdate) {
+      e.preventDefault()
+      const deltaX = (e.clientX - dragStartPos.x)
+      const deltaY = (e.clientY - dragStartPos.y)
+      
+      // Berechne die neue Position
+      let newX = elementStartPos.x + deltaX * stageSettings.dragAndDrop.textBlockSpeed / scale
+      let newY = elementStartPos.y + deltaY * stageSettings.dragAndDrop.textBlockSpeed / scale
+      
+      // Rasten am Raster ein
+      newX = snapToGrid(newX)
+      newY = snapToGrid(newY)
+      
+      // Überprüfe und aktualisiere Hilfslinien
+      const snappedPos = checkCenterGuide(newX, newY, activeBlock)
+      
+      onTextBlockUpdate({
+        ...activeBlock,
+        x: snappedPos.x,
+        y: snappedPos.y
+      })
+    }
+  }, [isDragging, dragStart, activeBlock, dragStartPos, elementStartPos, scale, onTextBlockUpdate, snapToGrid, checkCenterGuide])
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false)
+    setActiveBlock(null)
+    setShowCenterGuide(false)
+    setGuidePosition(null)
+  }, [])
+
+  useEffect(() => {
+    if (selectedText) {
+      const block = textBlocks.find(b => b.id === selectedText)
+      if (block && block.fontSize !== fontSize) {
+        onTextBlockUpdate({
+          ...block,
+          fontSize
+        })
+      }
+    }
+  }, [selectedText, fontSize, textBlocks, onTextBlockUpdate])
+
   const handleZoomIn = useCallback(() => {
-    setScale(prevScale => Math.min(5, prevScale + 0.1))
+    setScale(prevScale => Math.min(stageSettings.zoom.max, prevScale + stageSettings.zoom.buttonStep))
   }, [])
 
   const handleZoomOut = useCallback(() => {
-    setScale(prevScale => Math.max(0.1, prevScale - 0.1))
+    setScale(prevScale => Math.max(stageSettings.zoom.min, prevScale - stageSettings.zoom.buttonStep))
   }, [])
 
   const handleResetView = useCallback(() => {
-    setScale(1)
+    setScale(stageSettings.zoom.initial)
     setPosition({ x: 0, y: 0 })
   }, [])
 
@@ -107,17 +247,11 @@ export function Stage({
     }
   }, [textBlocks, onTextBlockUpdate])
 
-  useEffect(() => {
-    if (selectedText) {
-      const block = textBlocks.find(b => b.id === selectedText)
-      if (block && block.fontSize !== fontSize) {
-        onTextBlockUpdate({
-          ...block,
-          fontSize
-        })
-      }
-    }
-  }, [selectedText, fontSize, textBlocks, onTextBlockUpdate])
+  // Finde die Seitengröße aus der JSON-Datei
+  const posterSize = [
+    ...paperSizes.poster.portrait,
+    ...paperSizes.poster.landscape
+  ].find(size => size.id === pageSize)
 
   return (
     <div className="relative h-full flex">
@@ -132,41 +266,72 @@ export function Stage({
         style={{ touchAction: 'none' }}
       >
         <div 
-          className="absolute left-1/2 top-1/2 origin-center"
+          className="absolute left-1/2 top-1/2 origin-center bg-white shadow-[0_0_1px_rgba(0,0,0,0.4)]"
           style={{
             transform: `translate(-50%, -50%) translate(${position.x}px, ${position.y}px) scale(${scale})`,
             width: posterSize?.width || 500,
             height: posterSize?.height || 700,
             backgroundColor,
-            transition: isDragging ? 'none' : 'transform 0.1s ease-out'
+            transition: isDragging ? 'none' : `transform ${stageSettings.dragAndDrop.transitionDuration}ms ease-out`
           }}
         >
-          {/* Raster im Hintergrund */}
-          <div 
-            className="absolute inset-0 opacity-10"
-            style={{
-              backgroundImage: 'linear-gradient(to right, #000 1px, transparent 1px), linear-gradient(to bottom, #000 1px, transparent 1px)',
-              backgroundSize: '20px 20px'
-            }}
-          />
-
+          {/* Hilfslinien */}
+          {showCenterGuide && guidePosition && (
+            <>
+              {guidePosition.x === 50 && (
+                <div 
+                  className="absolute top-0 bottom-0 pointer-events-none"
+                  style={{
+                    left: '50%',
+                    width: `${stageSettings.dragAndDrop.guides.thickness}px`,
+                    backgroundColor: stageSettings.dragAndDrop.guides.color,
+                    opacity: stageSettings.dragAndDrop.guides.opacity,
+                    transform: 'translateX(-50%)'
+                  }}
+                />
+              )}
+              {guidePosition.y === 50 && (
+                <div 
+                  className="absolute left-0 right-0 pointer-events-none"
+                  style={{
+                    top: '50%',
+                    height: `${stageSettings.dragAndDrop.guides.thickness}px`,
+                    backgroundColor: stageSettings.dragAndDrop.guides.color,
+                    opacity: stageSettings.dragAndDrop.guides.opacity,
+                    transform: 'translateY(-50%)'
+                  }}
+                />
+              )}
+            </>
+          )}
           {/* Textblöcke */}
           {textBlocks.map(block => (
             <div
               key={block.id}
-              className={`absolute cursor-move ${block.selected ? 'ring-2 ring-blue-500' : ''}`}
+              className={`absolute cursor-move ${
+                block.selected ? `ring-2 ring-[${stageSettings.colors.selection}]/${stageSettings.colors.selectionOpacity}` : ''
+              }`}
               style={{
                 position: 'absolute',
-                left: `${block.x}px`,
-                top: `${block.y}px`,
-                color: block.color || '#000000',
+                left: `${block.x}%`,
+                top: `${block.y}%`,
+                color: block.color,
                 fontFamily: block.fontFamily,
                 fontSize: `${block.fontSize}px`,
-                fontStyle: block.fontStyle,
+                fontWeight: Number(block.fontWeight),
+                fontStyle: (block.fontStyle || '').includes('italic') ? 'italic' : 'normal',
                 userSelect: 'none',
                 transform: 'translate(-50%, -50%)',
-                whiteSpace: 'nowrap',
-                pointerEvents: 'auto'
+                whiteSpace: block.multiline ? 'normal' : 'nowrap',
+                width: editingText === block.id ? 
+                       `${Math.max(block.width || 20, 30)}%` : // Mindestens 30% beim Bearbeiten
+                       (block.multiline ? `${block.width || 20}%` : 'auto'),
+                lineHeight: block.lineHeight || 1.2,
+                textAlign: block.textAlign || 'left',
+                letterSpacing: `${block.letterSpacing || 0}px`,
+                cursor: editingText === block.id ? 'text' : 'move',
+                zIndex: block.zIndex,
+                padding: editingText === block.id ? '4px' : '0'
               }}
               onMouseDown={(e) => {
                 handleMouseDown(e, block)
@@ -176,27 +341,41 @@ export function Stage({
               onDoubleClick={() => handleTextDoubleClick(block.id)}
             >
               {editingText === block.id ? (
-                <input
-                  type="text"
+                <textarea
                   value={block.text}
                   onChange={(e) => handleTextChange(block.id, e.target.value)}
                   onBlur={() => setEditingText(null)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      setEditingText(null)
-                    }
-                  }}
-                  className="bg-transparent border-none outline-none text-center"
-                  style={{
-                    fontFamily: block.fontFamily,
-                    fontSize: `${block.fontSize}px`,
-                    fontStyle: block.fontStyle,
-                    color: block.color || '#000000'
-                  }}
                   autoFocus
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    outline: 'none',
+                    color: 'inherit',
+                    font: 'inherit',
+                    resize: 'none',
+                    width: '100%',
+                    height: 'auto',
+                    minHeight: '1.2em',
+                    display: 'block',
+                    margin: 0,
+                    padding: 0,
+                    overflow: 'hidden'
+                  }}
+                  rows={Math.max((block.text.match(/\n/g) || []).length + 1, 1)}
+                  onInput={(e) => {
+                    // Automatische Höhenanpassung
+                    const target = e.target as HTMLTextAreaElement
+                    target.style.height = 'auto'
+                    target.style.height = `${target.scrollHeight}px`
+                  }}
                 />
               ) : (
-                block.text
+                block.text.split('\n').map((line, i) => (
+                  <React.Fragment key={i}>
+                    {line}
+                    {i < block.text.split('\n').length - 1 && <br />}
+                  </React.Fragment>
+                ))
               )}
             </div>
           ))}

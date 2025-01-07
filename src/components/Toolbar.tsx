@@ -1,9 +1,8 @@
-// !!! WICHTIG: Diese Komponente ist essentiell für die Anwendung und darf nicht gelöscht werden !!!
-// !!! Sie enthält die Hauptsteuerelemente für die PDF-Generierung und Textbearbeitung !!!
+'use client'
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { FileDown } from 'lucide-react'
+import { Download } from 'lucide-react'
 import { generatePDF } from '@/lib/pdf-generator'
 import { TextBlock } from '@/types/text'
 import { PageSizeSelector } from "./toolbar/page-size-selector"
@@ -19,6 +18,8 @@ interface ToolbarProps {
   setFontSize: (size: number) => void
   fontStyle: string
   setFontStyle: (style: string) => void
+  fontWeight: number
+  setFontWeight: (weight: number) => void
   pageSize: string
   setPageSize: (size: string) => void
   selectedBlockId: string | null
@@ -37,6 +38,8 @@ export function Toolbar({
   setFontSize,
   fontStyle,
   setFontStyle,
+  fontWeight,
+  setFontWeight,
   pageSize,
   setPageSize,
   selectedBlockId,
@@ -47,12 +50,28 @@ export function Toolbar({
 }: ToolbarProps) {
   const handleGeneratePDF = async () => {
     try {
-      const pdf = await generatePDF({
+      const pdfBytes = await generatePDF({
         pageSize,
         backgroundColor,
         content: textBlocks
       })
-      pdf.save(`doktor-druck-${pageSize}.pdf`)
+
+      // Erstelle einen Blob aus den PDF-Bytes
+      const blob = new Blob([pdfBytes], { type: 'application/pdf' })
+      
+      // Erstelle eine URL für den Download
+      const url = window.URL.createObjectURL(blob)
+      
+      // Erstelle einen temporären Link und klicke ihn an
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'dokument.pdf'
+      document.body.appendChild(link)
+      link.click()
+      
+      // Räume auf
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
     } catch (error) {
       console.error('Fehler bei der PDF-Generierung:', error)
     }
@@ -93,6 +112,8 @@ export function Toolbar({
               setFontSize={setFontSize}
               fontStyle={fontStyle}
               setFontStyle={setFontStyle}
+              fontWeight={fontWeight}
+              setFontWeight={setFontWeight}
             />
           </CardContent>
         </Card>
@@ -100,10 +121,12 @@ export function Toolbar({
         {/* PDF Export */}
         <Button 
           className="w-full" 
+          variant="outline"
+          size="sm"
           onClick={handleGeneratePDF}
         >
-          <FileDown className="w-4 h-4 mr-2" />
-          Als PDF exportieren
+          <Download className="w-4 h-4 mr-1" />
+          PDF exportieren
         </Button>
       </div>
     </div>

@@ -1,17 +1,24 @@
 'use client'
 
+// !!! WICHTIG: Diese Komponente ist essentiell für die Anwendung und darf nicht gelöscht werden !!!
+// !!! Sie enthält die Hauptlogik für die PDF-Vorschau und Textbearbeitung !!!
+// !!! Die initiale Schriftgröße von 35 und die Schrittweite von 10 dürfen NICHT geändert werden !!!
+
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { Stage } from '@/components/Stage'
 import { Toolbar } from '@/components/Toolbar'
 import { LayerPanel } from '@/components/LayerPanel'
 import { TextBlock } from '@/types/text'
 import paperSizes from '@/data/paper-sizes.json'
+import { v4 as uuidv4 } from 'uuid'
+import { PrintMenubar } from '@/components/PrintMenubar'
 
 export default function DruckPage() {
   const [backgroundColor, setBackgroundColor] = useState('#ffffff')
   const [fontFamily, setFontFamily] = useState('Inter')
-  const [fontSize, setFontSize] = useState(12)
+  const [fontSize, setFontSize] = useState(35)
   const [fontStyle, setFontStyle] = useState('normal')
+  const [fontWeight, setFontWeight] = useState(400)
   const [pageSize, setPageSize] = useState('p1')
   const [stageWidth, setStageWidth] = useState(25) // rechter Bereich 25%
   const [layerPanelHeight, setLayerPanelHeight] = useState(40) // in vh
@@ -94,34 +101,85 @@ export default function DruckPage() {
     const blockHeight = 30
     
     const newBlock: TextBlock = {
-      id: `text-${Date.now()}`,
+      id: uuidv4(),
       text: 'Neuer Text',
-      x: (currentSize.width / 2),
-      y: (currentSize.height / 2),
+      x: 50, 
+      y: 50, 
       fontSize,
       fontFamily,
+      fontStyle,
+      fontWeight,
       color: '#000000',
       selected: false,
       width: blockWidth,
-      height: blockHeight
+      height: blockHeight,
+      zIndex: textBlocks.length
     }
     
     setTextBlocks(prev => [...prev, newBlock])
-  }, [pageSize, fontSize, fontFamily])
+  }, [pageSize, fontSize, fontFamily, fontStyle, fontWeight, textBlocks.length])
 
   const handleDeleteTextBlock = useCallback((id: string) => {
     setTextBlocks(prev => prev.filter(block => block.id !== id))
     setSelectedBlockId(null)
   }, [])
 
+  // Aktualisiere die Schriftart für den ausgewählten Block
+  useEffect(() => {
+    if (selectedBlockId) {
+      setTextBlocks(prev => prev.map(block => 
+        block.id === selectedBlockId
+          ? { ...block, fontFamily }
+          : block
+      ))
+    }
+  }, [fontFamily, selectedBlockId])
+
+  // Aktualisiere die Schriftgröße für den ausgewählten Block
+  useEffect(() => {
+    if (selectedBlockId) {
+      setTextBlocks(prev => prev.map(block => 
+        block.id === selectedBlockId
+          ? { ...block, fontSize }
+          : block
+      ))
+    }
+  }, [fontSize, selectedBlockId])
+
+  // Aktualisiere den Schriftstil für den ausgewählten Block
+  useEffect(() => {
+    if (selectedBlockId) {
+      setTextBlocks(prev => prev.map(block => 
+        block.id === selectedBlockId
+          ? { ...block, fontStyle }
+          : block
+      ))
+    }
+  }, [fontStyle, selectedBlockId])
+
+  // Aktualisiere das Schriftgewicht für den ausgewählten Block
+  useEffect(() => {
+    if (selectedBlockId) {
+      setTextBlocks(prev => prev.map(block => 
+        block.id === selectedBlockId
+          ? { ...block, fontWeight: String(fontWeight) }
+          : block
+      ))
+    }
+  }, [fontWeight, selectedBlockId])
+
   return (
     <div className="flex h-screen">
-      <div className="relative" style={{ width: `${100 - stageWidth}%` }}>
+      <div className="relative flex flex-col" style={{ width: `${100 - stageWidth}%` }}>
+        <div className="sticky top-0 z-50 bg-background border-b">
+          <PrintMenubar />
+        </div>
         <Stage
           backgroundColor={backgroundColor}
           fontFamily={fontFamily}
           fontSize={fontSize}
           fontStyle={fontStyle}
+          fontWeight={String(fontWeight)}
           pageSize={pageSize}
           textBlocks={textBlocks}
           onTextBlockUpdate={handleTextBlockUpdate}
@@ -139,21 +197,23 @@ export default function DruckPage() {
         </div>
         <div className="flex flex-col w-full">
           <Toolbar
-            backgroundColor={backgroundColor}
-            setBackgroundColor={setBackgroundColor}
+            selectedBlockId={selectedBlockId}
+            textBlocks={textBlocks}
+            onAddTextBlock={handleAddTextBlock}
+            onDeleteTextBlock={handleDeleteTextBlock}
+            onTextBlockUpdate={handleTextBlockUpdate}
             fontFamily={fontFamily}
             setFontFamily={setFontFamily}
             fontSize={fontSize}
             setFontSize={setFontSize}
             fontStyle={fontStyle}
             setFontStyle={setFontStyle}
+            fontWeight={fontWeight}
+            setFontWeight={setFontWeight}
             pageSize={pageSize}
             setPageSize={setPageSize}
-            selectedBlockId={selectedBlockId}
-            textBlocks={textBlocks}
-            onAddTextBlock={handleAddTextBlock}
-            onDeleteTextBlock={handleDeleteTextBlock}
-            onTextBlockUpdate={handleTextBlockUpdate}
+            backgroundColor={backgroundColor}
+            setBackgroundColor={setBackgroundColor}
           />
           <div className="relative flex-1">
             <div 
@@ -165,9 +225,7 @@ export default function DruckPage() {
             </div>
             <div style={{ height: `${layerPanelHeight}vh` }}>
               <LayerPanel
-                textBlocks={textBlocks}
-                onTextBlockSelect={handleTextBlockSelect}
-                onDeleteTextBlock={handleDeleteTextBlock}
+                blocks={textBlocks}
                 onTextBlockUpdate={handleTextBlockUpdate}
               />
             </div>

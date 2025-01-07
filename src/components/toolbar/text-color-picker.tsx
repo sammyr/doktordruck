@@ -1,3 +1,9 @@
+'use client'
+
+// !!! WICHTIG: Diese Komponente ist essentiell für die Farbauswahl und darf nicht gelöscht werden !!!
+// !!! Sie enthält die Farbauswahl für die Textbearbeitung !!!
+// !!! Alle Komponenten und Funktionen sind notwendig für die korrekte Funktionsweise !!!
+
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { ColorPicker } from "@/components/ui/color-picker"
@@ -6,14 +12,14 @@ import { TextBlock } from "@/types/text"
 
 interface TextColorPickerProps {
   selectedBlock: TextBlock | undefined
-  selectedBlockId: string | null
   onTextBlockUpdate: (block: TextBlock) => void
+  disabled?: boolean
 }
 
 export function TextColorPicker({ 
   selectedBlock, 
-  selectedBlockId, 
-  onTextBlockUpdate 
+  onTextBlockUpdate,
+  disabled = false
 }: TextColorPickerProps) {
   return (
     <div className="space-y-2">
@@ -23,21 +29,21 @@ export function TextColorPicker({
           <ColorPicker
             color={selectedBlock?.color || '#000000'}
             onChange={(color) => {
-              if (selectedBlockId && selectedBlock) {
+              if (selectedBlock) {
                 onTextBlockUpdate({
                   ...selectedBlock,
                   color
                 })
               }
             }}
-            disabled={!selectedBlockId}
+            disabled={disabled}
             label="Textfarbe wählen"
           />
           <Input
             type="text"
             value={selectedBlock?.color || '#000000'}
             onChange={(e) => {
-              if (selectedBlockId && selectedBlock) {
+              if (selectedBlock) {
                 onTextBlockUpdate({
                   ...selectedBlock,
                   color: e.target.value
@@ -45,7 +51,7 @@ export function TextColorPicker({
               }
             }}
             className="flex-1 h-12"
-            disabled={!selectedBlockId}
+            disabled={disabled}
             spellCheck={false}
           />
         </div>
@@ -61,14 +67,14 @@ export function TextColorPicker({
               }`}
               style={{ backgroundColor: color }}
               onClick={() => {
-                if (selectedBlockId && selectedBlock) {
+                if (selectedBlock) {
                   onTextBlockUpdate({
                     ...selectedBlock,
                     color
                   })
                 }
               }}
-              disabled={!selectedBlockId}
+              disabled={disabled}
               title={color}
             />
           ))}
