@@ -21,7 +21,7 @@ export default function DruckPage() {
   const [fontWeight, setFontWeight] = useState(400)
   const [pageSize, setPageSize] = useState('p1')
   const [stageWidth, setStageWidth] = useState(25) // rechter Bereich 25%
-  const [layerPanelHeight, setLayerPanelHeight] = useState(40) // in vh
+  const [layerPanelHeight, setLayerPanelHeight] = useState(10) // in vh
   const [textBlocks, setTextBlocks] = useState<TextBlock[]>([])
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null)
   const [isResizing, setIsResizing] = useState(false)
