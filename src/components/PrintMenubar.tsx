@@ -8,22 +8,31 @@ import {
   MenubarSeparator,
   MenubarShortcut,
   MenubarTrigger,
-} from "@/components/ui/menubar"
-import { saveProject } from '@/lib/project-manager'
-import { TextBlock } from '@/types/text'
+} from './ui/menubar'
+import { saveProject, loadProject } from '../lib/project-manager'
+import { TextBlock } from '../types/text'
+
+interface ProjectData {
+  version: string
+  pageSize: string
+  backgroundColor: string
+  textBlocks: TextBlock[]
+}
 
 interface PrintMenubarProps {
   backgroundColor: string
   pageSize: string
   textBlocks: TextBlock[]
   onGeneratePDF: () => void
+  onLoadProject: (data: ProjectData) => void
 }
 
 export function PrintMenubar({
   backgroundColor,
   pageSize,
   textBlocks,
-  onGeneratePDF
+  onGeneratePDF,
+  onLoadProject
 }: PrintMenubarProps) {
   const handleSave = async () => {
     try {
@@ -35,7 +44,33 @@ export function PrintMenubar({
       })
     } catch (error) {
       console.error('Fehler beim Speichern:', error)
-      // Hier könnte eine Benutzerbenachrichtigung eingefügt werden
+    }
+  }
+
+  const handleOpen = async () => {
+    try {
+      const input = document.createElement('input')
+      input.type = 'file'
+      input.accept = '.dd'
+      
+      input.onchange = async (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0]
+        if (!file) return
+        
+        try {
+          const projectData = await loadProject(file)
+          console.log('Geladene Projektdaten:', projectData)
+          onLoadProject(projectData)
+        } catch (error) {
+          console.error('Fehler beim Laden:', error)
+          alert('Fehler beim Laden der Datei: ' + (error instanceof Error ? error.message : 'Unbekannter Fehler'))
+        }
+      }
+      
+      input.click()
+    } catch (error) {
+      console.error('Fehler beim Öffnen:', error)
+      alert('Fehler beim Öffnen der Datei: ' + (error instanceof Error ? error.message : 'Unbekannter Fehler'))
     }
   }
 
@@ -47,7 +82,7 @@ export function PrintMenubar({
           <MenubarItem>
             Neu <MenubarShortcut>⌘N</MenubarShortcut>
           </MenubarItem>
-          <MenubarItem>
+          <MenubarItem onClick={handleOpen}>
             Öffnen <MenubarShortcut>⌘O</MenubarShortcut>
           </MenubarItem>
           <MenubarSeparator />

@@ -1,4 +1,4 @@
-import { TextBlock } from '@/types/text'
+import { TextBlock } from '../types/text'
 
 export interface ProjectData {
   version: string
@@ -7,64 +7,64 @@ export interface ProjectData {
   textBlocks: TextBlock[]
 }
 
-function getProjectFileName(textBlocks: TextBlock[]): string {
-  // Versuche den Namen des ersten Textblocks zu verwenden
-  const firstBlock = textBlocks.find(block => block.text.trim() !== '')
-  const projectName = firstBlock ? firstBlock.text.trim() : 'Projekt'
-  
-  // Entferne ungültige Dateinamenzeichen und ersetze Leerzeichen durch Unterstriche
-  const safeName = projectName
-    .replace(/[^a-zA-Z0-9äöüÄÖÜß\s-]/g, '')
-    .replace(/\s+/g, '_')
-    .substring(0, 50) // Begrenze die Länge auf 50 Zeichen
-  
-  return `${safeName}.dd`
-}
-
 export async function saveProject(data: ProjectData): Promise<void> {
-  try {
-    // Erstelle einen Blob mit den JSON-Daten
-    const jsonString = JSON.stringify(data, null, 2)
-    const blob = new Blob([jsonString], { type: 'application/json' })
-    
-    // Erstelle einen Download-Link
-    const url = window.URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = getProjectFileName(data.textBlocks)
-    
-    // Klicke den Link an
-    document.body.appendChild(link)
-    link.click()
-    
-    // Räume auf
-    document.body.removeChild(link)
-    window.URL.revokeObjectURL(url)
-  } catch (error) {
-    console.error('Fehler beim Speichern des Projekts:', error)
-    throw new Error('Projekt konnte nicht gespeichert werden')
-  }
+  const json = JSON.stringify(data)
+  const blob = new Blob([json], { type: 'application/json' })
+  
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(blob)
+  a.download = `projekt-${Date.now()}.dd`
+  a.click()
+  
+  URL.revokeObjectURL(a.href)
 }
 
 export async function loadProject(file: File): Promise<ProjectData> {
-  try {
-    // Prüfe die Dateiendung
-    if (!file.name.toLowerCase().endsWith('.dd')) {
-      throw new Error('Ungültiges Dateiformat. Bitte wählen Sie eine .dd-Datei.')
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result as string)
+        
+        // Validierung der Projektdaten
+        if (!data.version || !data.pageSize || !data.backgroundColor || !data.textBlocks) {
+          throw new Error('Ungültiges Projektformat')
+        }
+        
+        resolve({
+          version: data.version,
+          pageSize: data.pageSize,
+          backgroundColor: data.backgroundColor,
+          textBlocks: data.textBlocks.map((block: any) => ({
+            id: block.id || crypto.randomUUID(),
+            text: block.text || block.content || '',
+            x: block.x || (block.position?.x || 0),
+            y: block.y || (block.position?.y || 0),
+            color: block.color || '#000000',
+            fontFamily: block.fontFamily || 'Arial',
+            fontSize: block.fontSize || 16,
+            fontWeight: block.fontWeight || 400,
+            fontStyle: block.fontStyle || 'normal',
+            width: block.width || 100,
+            height: block.height || 30,
+            zIndex: block.zIndex || 0,
+            textAlign: block.textAlign || 'left',
+            lineHeight: block.lineHeight || 1.2,
+            letterSpacing: block.letterSpacing || 0,
+            multiline: block.multiline || false,
+            selected: block.selected || false
+          }))
+        })
+      } catch (error) {
+        reject(new Error('Ungültiges Projektformat'))
+      }
     }
     
-    // Lese die Datei
-    const text = await file.text()
-    const data = JSON.parse(text) as ProjectData
-    
-    // Validiere die Daten
-    if (!data.version || !data.pageSize || !Array.isArray(data.textBlocks)) {
-      throw new Error('Ungültiges Projektformat')
+    reader.onerror = () => {
+      reject(new Error('Fehler beim Lesen der Datei'))
     }
     
-    return data
-  } catch (error) {
-    console.error('Fehler beim Laden des Projekts:', error)
-    throw new Error('Projekt konnte nicht geladen werden')
-  }
+    reader.readAsText(file)
+  })
 }

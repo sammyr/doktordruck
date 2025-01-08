@@ -5,13 +5,20 @@
 // !!! Die initiale Schriftgröße von 35 und die Schrittweite von 10 dürfen NICHT geändert werden !!!
 
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { Stage } from '@/components/Stage'
-import { Toolbar } from '@/components/Toolbar'
-import { LayerPanel } from '@/components/LayerPanel'
-import { TextBlock } from '@/types/text'
-import paperSizes from '@/data/paper-sizes.json'
+import { Stage } from '../../components/Stage'
+import { Toolbar } from '../../components/Toolbar'
+import { LayerPanel } from '../../components/LayerPanel'
+import { TextBlock } from '../../types/text'
+import paperSizes from '../../data/paper-sizes.json'
 import { v4 as uuidv4 } from 'uuid'
-import { PrintMenubar } from '@/components/PrintMenubar'
+import { PrintMenubar } from '../../components/PrintMenubar'
+
+interface ProjectData {
+  version: string
+  pageSize: string
+  backgroundColor: string
+  textBlocks: TextBlock[]
+}
 
 export default function DruckPage() {
   const [backgroundColor, setBackgroundColor] = useState('#ffffff')
@@ -128,6 +135,12 @@ export default function DruckPage() {
     // Implement PDF generation logic here
   }, [])
 
+  const handleLoadProject = useCallback((data: ProjectData) => {
+    setBackgroundColor(data.backgroundColor)
+    setPageSize(data.pageSize)
+    setTextBlocks(data.textBlocks)
+  }, [])
+
   // Aktualisiere die Schriftart für den ausgewählten Block
   useEffect(() => {
     if (selectedBlockId) {
@@ -181,6 +194,7 @@ export default function DruckPage() {
             pageSize={pageSize}
             textBlocks={textBlocks}
             onGeneratePDF={handleGeneratePDF}
+            onLoadProject={handleLoadProject}
           />
         </div>
         <Stage

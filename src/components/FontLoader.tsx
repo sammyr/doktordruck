@@ -1,21 +1,21 @@
 'use client'
 
-import { fonts } from '@/data/fonts'
 import { useEffect } from 'react'
+import { loadFonts } from '../lib/fonts'
 
-export function FontLoader() {
+export default function FontLoader() {
   useEffect(() => {
-    fonts.forEach(font => {
-      font.weights.forEach(weight => {
-        const fontFace = new FontFace(font.family, `url(${font.path}/${weight.file})`, {
-          weight: weight.value.toString(),
-        })
-
-        fontFace.load().then(loadedFace => {
-          document.fonts.add(loadedFace)
-        }).catch(error => {
-          console.error(`Error loading font ${font.family} ${weight.name}:`, error)
-        })
+    // Load fonts from public directory
+    const fontFiles = [
+      '/fonts/Inter/regular.ttf',
+      '/fonts/Lato/regular.ttf',
+      '/fonts/Merriweather/regular.ttf'
+    ]
+    
+    fontFiles.forEach(fontPath => {
+      const font = new FontFace('CustomFont', `url(${fontPath})`)
+      font.load().then(loadedFont => {
+        document.fonts.add(loadedFont)
       })
     })
   }, [])

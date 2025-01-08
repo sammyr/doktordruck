@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { Button } from "@/components/ui/button"
-import { Navigation } from '@/components/Navigation'
-import { Footer } from '@/components/Footer'
+import { Button } from '../components/ui/button'
+import Navigation from '../components/Navigation'
+import Footer from '../components/Footer'
 
 /**
  * WICHTIG: KEINE LÖSCHUNGEN OHNE EXPLIZITE ANWEISUNG
