@@ -110,9 +110,13 @@ export default function DruckPage() {
       textAlign: 'center',
       lineHeight: 1.2,
       letterSpacing: 0,
-      multiline: false
+      multiline: false,
+      selected: true
     }
-    setTextBlocks([...textBlocks, newBlock])
+    // Deselektiere alle anderen Blöcke und füge den neuen Block hinzu
+    setTextBlocks([...textBlocks.map(block => ({ ...block, selected: false })), newBlock])
+    // Setze den selectedBlockId auf die ID des neuen Blocks
+    setSelectedBlockId(newBlock.id)
   }, [textBlocks, fontFamily, fontSize, fontWeight, fontStyle])
 
   const handleDeleteTextBlock = useCallback((id: string) => {

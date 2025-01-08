@@ -6,12 +6,17 @@ import { useEffect } from 'react'
 export function FontLoader() {
   useEffect(() => {
     fonts.forEach(font => {
-      if (font.url) {
-        const link = document.createElement('link')
-        link.href = font.url
-        link.rel = 'stylesheet'
-        document.head.appendChild(link)
-      }
+      font.weights.forEach(weight => {
+        const fontFace = new FontFace(font.family, `url(${font.path}/${weight.file})`, {
+          weight: weight.value.toString(),
+        })
+
+        fontFace.load().then(loadedFace => {
+          document.fonts.add(loadedFace)
+        }).catch(error => {
+          console.error(`Error loading font ${font.family} ${weight.name}:`, error)
+        })
+      })
     })
   }, [])
 

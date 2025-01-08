@@ -265,7 +265,10 @@ export function Stage({
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
         ref={stageRef}
-        style={{ touchAction: 'none' }}
+        style={{ 
+          touchAction: 'none',
+          cursor: isDragging ? stageSettings.cursors.stage.panning : stageSettings.cursors.stage.default
+        }}
       >
         <div 
           className="absolute left-1/2 top-1/2 origin-center bg-white shadow-[0_0_1px_rgba(0,0,0,0.4)]"
@@ -310,7 +313,7 @@ export function Stage({
           {textBlocks.map(block => (
             <div
               key={block.id}
-              className={`absolute cursor-move ${
+              className={`absolute ${
                 block.selected ? `ring-2 ring-[${stageSettings.colors.selection}]/${stageSettings.colors.selectionOpacity}` : ''
               }`}
               style={{
@@ -331,7 +334,7 @@ export function Stage({
                 lineHeight: block.lineHeight || 1.2,
                 textAlign: block.textAlign || 'left',
                 letterSpacing: `${block.letterSpacing || 0}px`,
-                cursor: editingText === block.id ? 'text' : 'move',
+                cursor: editingText === block.id ? stageSettings.cursors.textBlock.editing : stageSettings.cursors.textBlock.default,
                 zIndex: block.zIndex,
                 padding: editingText === block.id ? '4px' : '0'
               }}

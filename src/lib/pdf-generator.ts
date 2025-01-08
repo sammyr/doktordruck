@@ -5,6 +5,7 @@ import { jsPDF } from 'jspdf'
 import paperSizes from '@/data/paper-sizes.json'
 import { TextBlock } from '@/types/text'
 import { pdfSettings } from '@/config/settings'
+import { fonts } from '@/data/fonts'
 
 // Konvertiert Hex-Farbe in RGB
 function hexToRgb(hex: string) {
@@ -14,6 +15,16 @@ function hexToRgb(hex: string) {
     g: parseInt(result[2], 16),
     b: parseInt(result[3], 16)
   } : { r: 255, g: 255, b: 255 }
+}
+
+// Konvertiere ArrayBuffer zu Base64
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
 }
 
 // Setzt die Textstile für das PDF
@@ -68,6 +79,37 @@ function renderTextBlock(pdf: jsPDF, block: TextBlock, pageWidth: number, pageHe
   })
 }
 
+// Registriere die Schriftarten für jsPDF
+async function registerFonts(pdf: jsPDF) {
+  for (const font of fonts) {
+    for (const weight of font.weights) {
+      try {
+        // Erstelle den vollständigen Pfad zur Schriftart (ohne /public, da Next.js den public Ordner als Root verwendet)
+        const fontPath = `${font.path}/${weight.file}`
+        console.log('Lade Schriftart:', fontPath)
+        
+        const response = await fetch(fontPath)
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        const fontBuffer = await response.arrayBuffer()
+        const fontBase64 = arrayBufferToBase64(fontBuffer)
+        
+        // Registriere die Schriftart mit jsPDF
+        const fontStyle = pdfSettings.weightMapping[weight.value] || 'normal'
+        const fontKey = `${font.family}-${fontStyle}`
+        
+        pdf.addFileToVFS(fontKey, fontBase64)
+        pdf.addFont(fontKey, font.family, fontStyle)
+        
+        console.log('Schriftart erfolgreich geladen:', font.family, weight.name)
+      } catch (error) {
+        console.error(`Fehler beim Laden der Schriftart ${font.family} ${weight.name}:`, error)
+      }
+    }
+  }
+}
+
 interface PdfGeneratorOptions {
   pageSize: string
   backgroundColor: string
@@ -97,6 +139,9 @@ export async function generatePDF(options: PdfGeneratorOptions): Promise<Uint8Ar
       height + (bleed * 2)
     ]
   })
+
+  // Registriere die Schriftarten
+  await registerFonts(pdf)
 
   // Setze Hintergrundfarbe
   const bgColor = hexToRgb(options.backgroundColor)

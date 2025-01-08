@@ -120,6 +120,18 @@ export const stageSettings = {
       default: '#d1d5db',     // Standard-Farbe
       hover: '#9ca3af'        // Hover-Farbe
     }
+  },
+
+  // Cursor-Einstellungen
+  cursors: {
+    stage: {
+      default: 'default',           // Standard-Cursor für die Stage
+      panning: 'grabbing'           // Cursor während des Verschiebens der Stage mit der mittleren Maustaste
+    },
+    textBlock: {
+      default: 'pointer',           // Standard-Cursor für Textblöcke
+      editing: 'text'               // Cursor im Bearbeitungsmodus
+    }
   }
 } as const
 
