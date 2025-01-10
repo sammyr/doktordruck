@@ -1,28 +1,19 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  experimental: {
-    // Aktiviere notwendige experimentelle Features
-    serverActions: true,
-    serverComponentsExternalPackages: [],
-  },
   output: 'standalone',
   // Optimiere für Produktionsumgebung
   poweredByHeader: false,
   generateEtags: false,
-  // Cache-Einstellungen
-  onDemandEntries: {
-    maxInactiveAge: 60 * 1000,
-    pagesBufferLength: 2,
-  },
-  // Webpack-Konfiguration
+  // Webpack-Konfiguration für bessere Kompatibilität
   webpack: (config, { isServer }) => {
     if (!isServer) {
-      // Stelle sicher, dass Client-Komponenten korrekt gebundled werden
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-      };
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        // Füge explizite Aliase für problematische Module hinzu
+        'next/dist/client/components/static-generation-async-storage.external': 
+          require.resolve('next/dist/client/components/static-generation-async-storage.external'),
+      }
     }
     return config;
   },
