@@ -1,4 +1,4 @@
-// File: D:\___SYSTEM\Desktop\_NPM\doktordruck\src\app\druck\page.tsx
+// File: d:\___SYSTEM\Desktop\_NPM\doktordruck\src\app\druck\page.tsx
 import * as entry from '../../../../src/app/druck/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
