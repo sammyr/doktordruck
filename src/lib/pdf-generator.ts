@@ -27,31 +27,81 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
   return btoa(binary);
 }
 
+// Registriere die Schriftarten für jsPDF
+async function registerFonts(pdf: jsPDF) {
+  for (const font of fonts) {
+    try {
+      // Lade die Regular-Version als Standardschrift
+      const regularWeight = font.weights.find(w => w.value === 400) || font.weights[0];
+      const fontPath = `${font.path}/${regularWeight.file}`
+      console.log('Lade Schriftart:', fontPath)
+      
+      const response = await fetch(fontPath)
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      const fontBuffer = await response.arrayBuffer()
+      const fontBase64 = arrayBufferToBase64(fontBuffer)
+      
+      // Registriere die Basisschrift
+      pdf.addFileToVFS(`${font.family}.ttf`, fontBase64)
+      pdf.addFont(`${font.family}.ttf`, font.family, 'normal')
+      
+      // Lade zusätzliche Gewichte
+      for (const weight of font.weights) {
+        if (weight.value !== 400) { // Überspringe Regular, da bereits geladen
+          const weightPath = `${font.path}/${weight.file}`
+          const weightResponse = await fetch(weightPath)
+          if (weightResponse.ok) {
+            const weightBuffer = await weightResponse.arrayBuffer()
+            const weightBase64 = arrayBufferToBase64(weightBuffer)
+            const weightStyle = pdfSettings.weightMapping[weight.value]
+            
+            pdf.addFileToVFS(`${font.family}-${weightStyle}.ttf`, weightBase64)
+            pdf.addFont(`${font.family}-${weightStyle}.ttf`, font.family, weightStyle)
+          }
+        }
+      }
+      
+      console.log('Schriftart erfolgreich geladen:', font.family)
+    } catch (error) {
+      console.error('Fehler beim Laden der Schriftart:', font.family, error)
+    }
+  }
+}
+
 // Setzt die Textstile für das PDF
 function applyTextStyle(pdf: jsPDF, block: TextBlock) {
-  // Verwende die tatsächliche Schriftart direkt
-  const fontFamily = block.fontFamily
-  const fontStyle = pdfSettings.weightMapping[block.fontWeight] || 'normal'
-  
-  // Setze die Schriftart
-  pdf.setFont(fontFamily, fontStyle)
-  
-  // Schriftgrößenberechnung mit Skalierungsfaktor aus den Einstellungen
-  const fontSize = Math.round(block.fontSize * pdfSettings.fontScaleFactor)
-  pdf.setFontSize(fontSize)
-  
-  // Setze die Textfarbe
-  const textColor = hexToRgb(block.color)
-  pdf.setTextColor(textColor.r, textColor.g, textColor.b)
-  
-  // Setze den Buchstabenabstand, falls vorhanden
-  if (block.letterSpacing) {
-    pdf.setCharSpace(block.letterSpacing)
-  }
-  
-  // Setze die Zeilenhöhe, falls vorhanden
-  if (block.lineHeight) {
-    pdf.setLineHeightFactor(block.lineHeight)
+  try {
+    // Verwende die tatsächliche Schriftart
+    const fontFamily = block.fontFamily
+    const fontWeight = typeof block.fontWeight === 'string' ? parseInt(block.fontWeight) : block.fontWeight
+    const fontStyle = pdfSettings.weightMapping[fontWeight] || 'normal'
+    
+    // Setze die Schriftart
+    pdf.setFont(fontFamily, fontStyle)
+    
+    // Schriftgrößenberechnung mit Skalierungsfaktor
+    const fontSize = Math.round(block.fontSize * pdfSettings.fontScaleFactor)
+    pdf.setFontSize(fontSize)
+    
+    // Setze die Textfarbe
+    const textColor = hexToRgb(block.color)
+    pdf.setTextColor(textColor.r, textColor.g, textColor.b)
+    
+    // Setze den Buchstabenabstand, falls vorhanden
+    if (block.letterSpacing) {
+      pdf.setCharSpace(block.letterSpacing)
+    }
+    
+    // Setze die Zeilenhöhe, falls vorhanden
+    if (block.lineHeight) {
+      pdf.setLineHeightFactor(block.lineHeight)
+    }
+  } catch (error) {
+    console.error('Fehler beim Anwenden der Textstile:', error)
+    // Fallback zu Standard-Schriftart
+    pdf.setFont('helvetica', 'normal')
   }
 }
 
@@ -77,37 +127,6 @@ function renderTextBlock(pdf: jsPDF, block: TextBlock, pageWidth: number, pageHe
     baseline: 'middle',
     maxWidth: pageWidth - (pdfSettings.minMargin * 2)
   })
-}
-
-// Registriere die Schriftarten für jsPDF
-async function registerFonts(pdf: jsPDF) {
-  for (const font of fonts) {
-    for (const weight of font.weights) {
-      try {
-        // Erstelle den vollständigen Pfad zur Schriftart (ohne /public, da Next.js den public Ordner als Root verwendet)
-        const fontPath = `${font.path}/${weight.file}`
-        console.log('Lade Schriftart:', fontPath)
-        
-        const response = await fetch(fontPath)
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        const fontBuffer = await response.arrayBuffer()
-        const fontBase64 = arrayBufferToBase64(fontBuffer)
-        
-        // Registriere die Schriftart mit jsPDF
-        const fontStyle = pdfSettings.weightMapping[weight.value] || 'normal'
-        const fontKey = `${font.family}-${fontStyle}`
-        
-        pdf.addFileToVFS(fontKey, fontBase64)
-        pdf.addFont(fontKey, font.family, fontStyle)
-        
-        console.log('Schriftart erfolgreich geladen:', font.family, weight.name)
-      } catch (error) {
-        console.error(`Fehler beim Laden der Schriftart ${font.family} ${weight.name}:`, error)
-      }
-    }
-  }
 }
 
 interface PdfGeneratorOptions {

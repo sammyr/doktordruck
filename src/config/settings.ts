@@ -9,45 +9,17 @@ export const pdfSettings = {
   // Minimaler Randabstand in mm
   minMargin: 10,
   
-  // Standard-Schriftarten-Mapping
-  fontMapping: {
-    'Inter': 'helvetica',
-    'Roboto': 'helvetica',
-    'Playfair Display': 'times',
-    'Helvetica Neue': 'helvetica',
-    'Futura': 'helvetica',
-    'Garamond': 'times',
-    'Bodoni': 'times',
-    'Frutiger': 'helvetica',
-    'Avenir': 'helvetica',
-    'Proxima Nova': 'helvetica',
-    'Montserrat': 'helvetica',
-    'Open Sans': 'helvetica',
-    'Gotham': 'helvetica',
-    'Oswald': 'helvetica',
-    'Merriweather': 'times',
-    'Quicksand': 'helvetica',
-    'Work Sans': 'helvetica',
-    'Lato': 'helvetica',
-    'Poppins': 'helvetica',
-    'Source Sans Pro': 'helvetica',
-    'Raleway': 'helvetica',
-    'PT Sans': 'helvetica',
-    'Nunito': 'helvetica',
-    'Ubuntu': 'helvetica'
-  },
-  
   // Gewicht-Mapping für Schriftarten
   weightMapping: {
-    100: 'normal',
-    200: 'normal',
-    300: 'normal',
-    400: 'normal',
-    500: 'normal',
-    600: 'bold',
-    700: 'bold',
-    800: 'bold',
-    900: 'bold'
+    100: 'normal',  // Thin
+    200: 'normal',  // Extra Light
+    300: 'normal',  // Light
+    400: 'normal',  // Regular
+    500: 'bold',    // Medium
+    600: 'bold',    // Semi Bold
+    700: 'bold',    // Bold
+    800: 'bold',    // Extra Bold
+    900: 'bold'     // Black
   }
 } as const
 

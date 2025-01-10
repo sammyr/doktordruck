@@ -236,3 +236,99 @@ graph LR
 ---
 
 *Diese Dokumentation wird kontinuierlich aktualisiert, um Änderungen und Verbesserungen der Anwendung zu reflektieren.*
+
+## Schriftarten einbinden
+
+### Übersicht des Schrifteinbindungsprozesses
+Die Anwendung verwendet ein strukturiertes System zur Einbindung und Verwaltung von Schriftarten. Am Beispiel der Quicksand-Schriftfamilie wird der Prozess im Detail erklärt.
+
+### 1. Schriftdateien vorbereiten
+```
+public/fonts/Quicksand/
+├── Quicksand-regular.ttf  # Basis-Schriftschnitt (400)
+├── Quicksand-medium.ttf   # Medium-Schriftschnitt (500)
+├── Quicksand-semibold.ttf # Halbfett-Schriftschnitt (600)
+└── Quicksand-bold.ttf     # Fett-Schriftschnitt (700)
+```
+
+- Schriftdateien im TTF-Format in den entsprechenden Ordner unter `public/fonts/` ablegen
+- Dateinamen sollten dem Schema `[Schriftname]-[gewicht].ttf` folgen
+- Mindestens die Regular-Variante (400) sollte vorhanden sein
+
+### 2. Schrift in fonts.ts registrieren
+In `src/data/fonts.ts` wird die Schrift mit allen verfügbaren Gewichten definiert:
+
+```typescript
+{
+  name: 'Quicksand',      // Anzeigename
+  family: 'Quicksand',    // CSS font-family Name
+  path: '/fonts/Quicksand', // Pfad relativ zu public/
+  weights: [
+    { value: 400, name: 'Regular', file: 'Quicksand-regular.ttf' },
+    { value: 500, name: 'Medium', file: 'Quicksand-medium.ttf' },
+    { value: 600, name: 'Semi Bold', file: 'Quicksand-semibold.ttf' },
+    { value: 700, name: 'Bold', file: 'Quicksand-bold.ttf' }
+  ]
+}
+```
+
+Wichtige Felder:
+- `name`: Name für die UI-Anzeige
+- `family`: Technischer Name für CSS und PDF
+- `path`: Pfad zum Schriftordner (relativ zu public/)
+- `weights`: Array der verfügbaren Schriftschnitte
+  - `value`: Numerischer Gewichtswert (100-900)
+  - `name`: Beschreibender Name des Gewichts
+  - `file`: Dateiname der Schriftdatei
+
+### 3. PDF-Gewicht-Mapping
+In `src/config/settings.ts` wird definiert, wie die Schriftgewichte in der PDF-Ausgabe behandelt werden:
+
+```typescript
+weightMapping: {
+  100: 'normal',  // Thin
+  200: 'normal',  // Extra Light
+  300: 'normal',  // Light
+  400: 'normal',  // Regular
+  500: 'bold',    // Medium
+  600: 'bold',    // Semi Bold
+  700: 'bold',    // Bold
+  800: 'bold',    // Extra Bold
+  900: 'bold'     // Black
+}
+```
+
+### 4. Automatische Verarbeitung
+Der PDF-Generator (`src/lib/pdf-generator.ts`) verarbeitet die Schriften automatisch:
+1. Lädt die Regular-Variante als Basis
+2. Registriert zusätzliche Gewichte
+3. Wendet das Gewicht-Mapping an
+
+### Neue Schrift hinzufügen - Checkliste
+1. Schriftdateien vorbereiten:
+   - TTF-Dateien in neuem Ordner unter `public/fonts/` ablegen
+   - Korrekte Benennung der Dateien beachten
+
+2. Schrift registrieren:
+   - Neuen Eintrag in `fonts.ts` erstellen
+   - Alle verfügbaren Gewichte auflisten
+   - Pfade und Dateinamen überprüfen
+
+3. Testen:
+   - Anwendung neu starten
+   - Schrift in UI-Auswahl prüfen
+   - PDF-Export mit verschiedenen Gewichten testen
+
+### Wichtige Hinweise
+- Nur TTF-Format wird unterstützt
+- Gewichte 100-400 werden als 'normal' exportiert
+- Gewichte 500-900 werden als 'bold' exportiert
+- Regular (400) ist erforderlich
+- Dateinamen müssen exakt mit den Einträgen in `fonts.ts` übereinstimmen
+
+### Fehlerbehebung
+Bei Problemen prüfen:
+1. Sind alle Schriftdateien im korrekten Format?
+2. Stimmen die Pfade in `fonts.ts` mit der Ordnerstruktur überein?
+3. Sind die Dateinamen korrekt geschrieben?
+4. Wurde die Regular-Variante (400) bereitgestellt?
