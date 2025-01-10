@@ -31,6 +31,13 @@
       "static/chunks/20-b399d411ddd977f1.js",
       "static/chunks/app/page-227ffd35e3197a29.js"
     ],
+    "/druck/layout": [
+      "static/chunks/webpack-70b12e7897a2f226.js",
+      "static/chunks/fd9d1056-2d90ed960893ce6a.js",
+      "static/chunks/938-7ae43b6495e07946.js",
+      "static/chunks/main-app-badfca72bfc6abb2.js",
+      "static/chunks/app/druck/layout-bf3cb36d9ea13901.js"
+    ],
     "/druck/page": [
       "static/chunks/webpack-70b12e7897a2f226.js",
       "static/chunks/fd9d1056-2d90ed960893ce6a.js",
@@ -40,13 +47,6 @@
       "static/chunks/602dbae6-b7004ec301905cbf.js",
       "static/chunks/470-dadc60b970cca3e0.js",
       "static/chunks/app/druck/page-c06607ffa6479850.js"
-    ],
-    "/druck/layout": [
-      "static/chunks/webpack-70b12e7897a2f226.js",
-      "static/chunks/fd9d1056-2d90ed960893ce6a.js",
-      "static/chunks/938-7ae43b6495e07946.js",
-      "static/chunks/main-app-badfca72bfc6abb2.js",
-      "static/chunks/app/druck/layout-bf3cb36d9ea13901.js"
     ]
   }
 }
