@@ -2,7 +2,9 @@
 const nextConfig = {
   reactStrictMode: true,
   experimental: {
-    // Deaktiviere experimentelle Features
+    // Aktiviere notwendige experimentelle Features
+    serverActions: true,
+    serverComponentsExternalPackages: [],
   },
   output: 'standalone',
   // Optimiere für Produktionsumgebung
@@ -12,6 +14,17 @@ const nextConfig = {
   onDemandEntries: {
     maxInactiveAge: 60 * 1000,
     pagesBufferLength: 2,
+  },
+  // Webpack-Konfiguration
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // Stelle sicher, dass Client-Komponenten korrekt gebundled werden
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+      };
+    }
+    return config;
   },
 }
 
