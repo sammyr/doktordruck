@@ -332,7 +332,7 @@ export function Stage({
                        `${Math.max(block.width || 20, 30)}%` : // Mindestens 30% beim Bearbeiten
                        (block.multiline ? `${block.width || 20}%` : 'auto'),
                 lineHeight: block.lineHeight || 1.2,
-                textAlign: block.textAlign || 'left',
+                textAlign: (['left', 'right', 'center'].includes(block.textAlign) ? block.textAlign : 'left'),
                 letterSpacing: `${block.letterSpacing || 0}px`,
                 cursor: editingText === block.id ? stageSettings.cursors.textBlock.editing : stageSettings.cursors.textBlock.default,
                 zIndex: block.zIndex,
@@ -398,7 +398,7 @@ export function Stage({
       <div className="w-16 bg-white p-4 border-l flex flex-col items-center space-y-4">
         <Button
           variant="ghost"
-          size="icon"
+          size="sm"
           onClick={handleZoomIn}
           className="w-8 h-8"
         >
@@ -411,7 +411,7 @@ export function Stage({
 
         <Button
           variant="ghost"
-          size="icon"
+          size="sm"
           onClick={handleZoomOut}
           className="w-8 h-8"
         >
@@ -420,7 +420,7 @@ export function Stage({
 
         <Button
           variant="ghost"
-          size="icon"
+          size="sm"
           onClick={handleResetView}
           className="w-8 h-8"
           title="Ansicht zurücksetzen"
@@ -430,7 +430,7 @@ export function Stage({
 
         <Button
           variant="ghost"
-          size="icon"
+          size="sm"
           onClick={onAddTextBlock}
           className="w-8 h-8"
           title="Text hinzufügen"

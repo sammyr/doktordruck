@@ -1,3 +1,5 @@
+type TextAlign = 'left' | 'right' | 'center';
+
 export interface TextBlock {
   id: string
   text: string
@@ -11,7 +13,7 @@ export interface TextBlock {
   width: number
   height: number
   zIndex: number
-  textAlign: string
+  textAlign: TextAlign
   lineHeight: number
   letterSpacing: number
   multiline: boolean

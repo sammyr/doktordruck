@@ -24,7 +24,7 @@ export function FontStyleButtons({
     <div className="flex gap-2">
       <Button
         variant={isItalic ? 'default' : 'outline'}
-        size="icon"
+        size="sm"
         onClick={() => setFontStyle(isItalic ? 'normal' : 'italic')}
         disabled={disabled}
         className="h-9 w-9"
@@ -35,7 +35,7 @@ export function FontStyleButtons({
       <div className="flex border rounded-md">
         <Button
           variant={textAlign === 'left' ? 'default' : 'ghost'}
-          size="icon"
+          size="sm"
           onClick={() => setTextAlign('left')}
           disabled={disabled}
           className="h-9 w-9 rounded-r-none"
@@ -44,16 +44,16 @@ export function FontStyleButtons({
         </Button>
         <Button
           variant={textAlign === 'center' ? 'default' : 'ghost'}
-          size="icon"
+          size="sm"
           onClick={() => setTextAlign('center')}
           disabled={disabled}
-          className="h-9 w-9 rounded-none border-l border-r"
+          className="h-9 w-9 rounded-none border-x-0"
         >
           <AlignCenter className="h-4 w-4" />
         </Button>
         <Button
           variant={textAlign === 'right' ? 'default' : 'ghost'}
-          size="icon"
+          size="sm"
           onClick={() => setTextAlign('right')}
           disabled={disabled}
           className="h-9 w-9 rounded-l-none"

@@ -55,7 +55,7 @@ export function NumberStepper({
         <div className="absolute right-0 inset-y-0 flex flex-col border-l">
           <Button
             variant="ghost"
-            size="icon"
+            size="sm"
             className="h-[18px] w-8 rounded-none rounded-tr-md px-1 hover:bg-gray-100"
             onClick={handleIncrement}
             disabled={disabled || value >= max}
@@ -64,7 +64,7 @@ export function NumberStepper({
           </Button>
           <Button
             variant="ghost"
-            size="icon"
+            size="sm"
             className="h-[18px] w-8 rounded-none rounded-br-md px-1 hover:bg-gray-100"
             onClick={handleDecrement}
             disabled={disabled || value <= min}

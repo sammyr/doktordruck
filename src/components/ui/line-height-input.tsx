@@ -54,7 +54,7 @@ export function LineHeightInput({
         <div className="flex flex-col border-l-0">
           <Button
             variant="outline"
-            size="icon"
+            size="sm"
             className="h-[18px] w-6 rounded-none rounded-tr-md border-l-0 px-1"
             onClick={handleIncrement}
             disabled={disabled || value >= max}
@@ -63,7 +63,7 @@ export function LineHeightInput({
           </Button>
           <Button
             variant="outline"
-            size="icon"
+            size="sm"
             className="h-[18px] w-6 rounded-none rounded-br-md border-l-0 border-t-0 px-1"
             onClick={handleDecrement}
             disabled={disabled || value <= min}
