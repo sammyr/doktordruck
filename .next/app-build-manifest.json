@@ -1,25 +1,52 @@
 {
   "pages": {
+    "/_not-found": [
+      "static/chunks/webpack-330a3970c5eb8a9d.js",
+      "static/chunks/fd9d1056-2d90ed960893ce6a.js",
+      "static/chunks/938-7ae43b6495e07946.js",
+      "static/chunks/main-app-badfca72bfc6abb2.js",
+      "static/chunks/app/_not-found-8b8db72152dc2deb.js"
+    ],
     "/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/layout.css",
-      "static/chunks/app/layout.js"
+      "static/chunks/webpack-330a3970c5eb8a9d.js",
+      "static/chunks/fd9d1056-2d90ed960893ce6a.js",
+      "static/chunks/938-7ae43b6495e07946.js",
+      "static/chunks/main-app-badfca72bfc6abb2.js",
+      "static/css/92203c6fc20cac7a.css",
+      "static/chunks/app/layout-b84ca2b4ac85fb4f.js"
+    ],
+    "/impressum/page": [
+      "static/chunks/webpack-330a3970c5eb8a9d.js",
+      "static/chunks/fd9d1056-2d90ed960893ce6a.js",
+      "static/chunks/938-7ae43b6495e07946.js",
+      "static/chunks/main-app-badfca72bfc6abb2.js",
+      "static/chunks/20-b399d411ddd977f1.js",
+      "static/chunks/app/impressum/page-128db8556e71f736.js"
+    ],
+    "/page": [
+      "static/chunks/webpack-330a3970c5eb8a9d.js",
+      "static/chunks/fd9d1056-2d90ed960893ce6a.js",
+      "static/chunks/938-7ae43b6495e07946.js",
+      "static/chunks/main-app-badfca72bfc6abb2.js",
+      "static/chunks/20-b399d411ddd977f1.js",
+      "static/chunks/app/page-227ffd35e3197a29.js"
     ],
     "/druck/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/druck/page.js"
+      "static/chunks/webpack-330a3970c5eb8a9d.js",
+      "static/chunks/fd9d1056-2d90ed960893ce6a.js",
+      "static/chunks/938-7ae43b6495e07946.js",
+      "static/chunks/main-app-badfca72bfc6abb2.js",
+      "static/chunks/164f4fb6-a7eac8cf8e6acc89.js",
+      "static/chunks/602dbae6-b7004ec301905cbf.js",
+      "static/chunks/470-dadc60b970cca3e0.js",
+      "static/chunks/app/druck/page-63993cd8a609a576.js"
     ],
     "/druck/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/druck/layout.js"
-    ],
-    "/not-found": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/not-found.js"
+      "static/chunks/webpack-330a3970c5eb8a9d.js",
+      "static/chunks/fd9d1056-2d90ed960893ce6a.js",
+      "static/chunks/938-7ae43b6495e07946.js",
+      "static/chunks/main-app-badfca72bfc6abb2.js",
+      "static/chunks/app/druck/layout-bf3cb36d9ea13901.js"
     ]
   }
 }
