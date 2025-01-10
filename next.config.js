@@ -4,7 +4,9 @@ const path = require('path')
 const nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
-  distDir: '.next',
+  experimental: {
+    serverActions: true,
+  },
   // Optimiere für Produktionsumgebung
   poweredByHeader: false,
   generateEtags: false,
@@ -15,14 +17,6 @@ const nextConfig = {
       ...config.resolve.alias,
       '@app': path.join(__dirname, 'src'),
     }
-
-    // Erzwinge POSIX-Pfade auch unter Windows
-    config.resolve.extensionAlias = {
-      '.js': ['.js', '.ts', '.tsx'],
-    }
-
-    // Setze Module-Auflösung auf "node"
-    config.resolve.modules = ['node_modules', path.resolve(__dirname, 'src')]
 
     return config
   },
