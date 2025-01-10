@@ -1,22 +1,33 @@
 /** @type {import('next').NextConfig} */
+const path = require('path')
+
 const nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
+  distDir: '.next',
   // Optimiere für Produktionsumgebung
   poweredByHeader: false,
   generateEtags: false,
   // Webpack-Konfiguration für bessere Kompatibilität
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      config.resolve.alias = {
-        ...config.resolve.alias,
-        // Füge explizite Aliase für problematische Module hinzu
-        'next/dist/client/components/static-generation-async-storage.external': 
-          require.resolve('next/dist/client/components/static-generation-async-storage.external'),
-      }
+  webpack: (config, { dev, isServer }) => {
+    // Füge Alias für problematische Module hinzu
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@app': path.join(__dirname, 'src'),
     }
-    return config;
+
+    // Erzwinge POSIX-Pfade auch unter Windows
+    config.resolve.extensionAlias = {
+      '.js': ['.js', '.ts', '.tsx'],
+    }
+
+    // Setze Module-Auflösung auf "node"
+    config.resolve.modules = ['node_modules', path.resolve(__dirname, 'src')]
+
+    return config
   },
+  // Setze strikte Produktionseinstellungen
+  productionBrowserSourceMaps: false,
 }
 
 module.exports = nextConfig
