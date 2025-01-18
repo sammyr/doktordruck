@@ -10,7 +10,7 @@ import { Type, Trash2, AlignCenter, AlignLeft, AlignRight, Bold, Italic } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
 import { NumberStepper } from "@/components/ui/number-stepper"
-import { TextBlock } from "@/types/text"
+import type { TextBlock } from "@/types/text"
 import { TextColorPicker } from "./text-color-picker"
 import { FontStyleButtons } from "./font-style-buttons"
 import { fonts } from '@/data/fonts'
@@ -31,18 +31,6 @@ interface TextControlsProps {
   setFontStyle: (style: string) => void
   fontWeight: number
   setFontWeight: (weight: number) => void
-}
-
-interface TextBlock {
-  id: string
-  text: string
-  originalText?: string
-  x: number
-  y: number
-  fontSize: number
-  textAlign: 'left' | 'center' | 'right'
-  fontFamily: string
-  isUpperCase?: boolean
 }
 
 export function TextControls({
@@ -221,7 +209,6 @@ export function TextControls({
           <TextColorPicker
             selectedBlock={selectedBlock}
             onTextBlockUpdate={onTextBlockUpdate}
-            disabled={!selectedBlockId}
           />
         </div>
       </div>

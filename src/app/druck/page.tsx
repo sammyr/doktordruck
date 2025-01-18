@@ -199,14 +199,15 @@ export default function DruckPage() {
         </div>
         <Stage
           backgroundColor={backgroundColor}
+          onBackgroundColorChange={setBackgroundColor}
           fontFamily={fontFamily}
           fontSize={fontSize}
           fontStyle={fontStyle}
-          fontWeight={String(fontWeight)}
+          fontWeight={fontWeight}
           pageSize={pageSize}
           textBlocks={textBlocks}
           onTextBlockUpdate={handleTextBlockUpdate}
-          onTextBlockSelect={handleTextBlockSelect}
+          onTextBlockSelect={setSelectedBlockId}
           onAddTextBlock={handleAddTextBlock}
         />
       </div>

@@ -4,9 +4,6 @@ const path = require('path')
 const nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
-  experimental: {
-    serverActions: true,
-  },
   // Optimiere für Produktionsumgebung
   poweredByHeader: false,
   generateEtags: false,

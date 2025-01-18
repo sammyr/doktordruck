@@ -14,19 +14,18 @@ export function TextUppercaseButton({ selectedBlock, onTextBlockUpdate }: TextUp
     
     if (!selectedBlock.isUpperCase) {
       // Beim ersten Klick: Speichere Original und konvertiere zu Großbuchstaben
-      const originalText = selectedBlock.originalText || selectedBlock.text
       onTextBlockUpdate({
         ...selectedBlock,
-        originalText: originalText,
+        originalText: selectedBlock.text, // Speichere den aktuellen Text als Original
         text: selectedBlock.text.toUpperCase(),
         isUpperCase: true
       })
     } else {
       // Beim zweiten Klick: Stelle Original wieder her
-      const originalText = selectedBlock.originalText || selectedBlock.text.toLowerCase()
       onTextBlockUpdate({
         ...selectedBlock,
-        text: originalText,
+        text: selectedBlock.originalText || selectedBlock.text, // Verwende das Original
+        originalText: undefined, // Lösche das Original
         isUpperCase: false
       })
     }

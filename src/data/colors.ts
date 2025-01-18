@@ -14,4 +14,4 @@ export const colorPalette = {
     '#f4ec7b',  // Gelb
     '#f47a60',  // Orange
   ]
-} as const
+}

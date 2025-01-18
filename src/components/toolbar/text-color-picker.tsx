@@ -5,81 +5,42 @@
 // !!! Alle Komponenten und Funktionen sind notwendig für die korrekte Funktionsweise !!!
 
 import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { ColorPicker } from "@/components/ui/color-picker"
-import { colorPalette } from '@/data/colors'
+import { useState } from "react"
 import { TextBlock } from "@/types/text"
+import { ColorSwatchGallery } from "@/components/ui/color-swatch-gallery"
+import { colorPalette } from "@/data/colors"
 
 interface TextColorPickerProps {
-  selectedBlock: TextBlock | undefined
+  selectedBlock: TextBlock | null
   onTextBlockUpdate: (block: TextBlock) => void
-  disabled?: boolean
 }
 
-export function TextColorPicker({ 
-  selectedBlock, 
-  onTextBlockUpdate,
-  disabled = false
-}: TextColorPickerProps) {
+export function TextColorPicker({ selectedBlock, onTextBlockUpdate }: TextColorPickerProps) {
+  const [colors, setColors] = useState<string[]>([...colorPalette.text])
+
+  const handleColorSelect = (color: string) => {
+    if (!selectedBlock) return
+    onTextBlockUpdate({
+      ...selectedBlock,
+      color
+    })
+  }
+
+  const handleAddColor = (newColor: string) => {
+    setColors([...colors, newColor])
+    handleColorSelect(newColor)
+  }
+
   return (
     <div className="space-y-2">
-      <Label htmlFor="textColor">Textfarbe</Label>
-      <div className="space-y-2">
-        <div className="flex space-x-2">
-          <ColorPicker
-            color={selectedBlock?.color || '#000000'}
-            onChange={(color) => {
-              if (selectedBlock) {
-                onTextBlockUpdate({
-                  ...selectedBlock,
-                  color
-                })
-              }
-            }}
-            disabled={disabled}
-            label="Textfarbe wählen"
-          />
-          <Input
-            type="text"
-            value={selectedBlock?.color || '#000000'}
-            onChange={(e) => {
-              if (selectedBlock) {
-                onTextBlockUpdate({
-                  ...selectedBlock,
-                  color: e.target.value
-                })
-              }
-            }}
-            className="flex-1 h-12"
-            disabled={disabled}
-            spellCheck={false}
-          />
-        </div>
-        
-        <div className="grid grid-cols-6 gap-2 p-2">
-          {colorPalette.text.map((color, index) => (
-            <button
-              key={`text-${color}-${index}`}
-              className={`w-8 h-8 rounded-lg border transition-all ${
-                selectedBlock?.color === color 
-                  ? 'border-blue-500 scale-110' 
-                  : 'border-gray-200 hover:scale-105'
-              }`}
-              style={{ backgroundColor: color }}
-              onClick={() => {
-                if (selectedBlock) {
-                  onTextBlockUpdate({
-                    ...selectedBlock,
-                    color
-                  })
-                }
-              }}
-              disabled={disabled}
-              title={color}
-            />
-          ))}
-        </div>
-      </div>
+      <Label>Textfarbe</Label>
+      <ColorSwatchGallery
+        colors={colors}
+        selectedColor={selectedBlock?.color || '#000000'}
+        onColorSelect={handleColorSelect}
+        onAddColor={handleAddColor}
+        label="Textfarbe wählen"
+      />
     </div>
   )
 }

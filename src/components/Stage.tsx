@@ -4,7 +4,7 @@
 // !!! Sie darf NICHT gelöscht oder verschoben werden, da sie für die Zoom-Funktionalität benötigt wird !!!
 
 import React, { useState, useCallback, useRef, useEffect } from 'react'
-import { TextBlock } from '@/types/text'
+import type { TextBlock } from '@/types/text'
 import paperSizes from '@/data/paper-sizes.json'
 import { ZoomIn, ZoomOut, Grid as GridIcon, Ruler as RulerIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -15,28 +15,30 @@ import { stageSettings } from '@/config/settings'
 
 interface StageProps {
   backgroundColor: string
-  fontFamily: string
-  fontSize: number
-  fontStyle: string
-  fontWeight: string | number
-  pageSize: string
+  onBackgroundColorChange: (color: string) => void
   textBlocks: TextBlock[]
   onTextBlockUpdate: (block: TextBlock) => void
   onTextBlockSelect: (id: string) => void
   onAddTextBlock: () => void
+  fontFamily: string
+  fontSize: number
+  fontStyle: string
+  fontWeight: number
+  pageSize: string
 }
 
 export function Stage({
   backgroundColor,
+  onBackgroundColorChange,
+  textBlocks,
+  onTextBlockUpdate,
+  onTextBlockSelect,
+  onAddTextBlock,
   fontFamily,
   fontSize,
   fontStyle,
   fontWeight,
-  pageSize,
-  textBlocks,
-  onTextBlockUpdate,
-  onTextBlockSelect,
-  onAddTextBlock
+  pageSize
 }: StageProps) {
   const stageRef = useRef<HTMLDivElement>(null)
   const [scale, setScale] = useState<number>(1.8)
@@ -328,7 +330,7 @@ export function Stage({
   const posterSize = [
     ...paperSizes.poster.portrait,
     ...paperSizes.poster.landscape
-  ].find(size => size.id === pageSize)
+  ].find(size => size.id === pageSize) 
 
   return (
     <div className="relative h-full flex">
@@ -521,17 +523,4 @@ export function Stage({
       </div>
     </div>
   )
-}
-
-interface TextBlock {
-  id: string
-  text: string
-  originalText?: string
-  x: number
-  y: number
-  fontSize: number
-  textAlign: 'left' | 'center' | 'right'
-  fontFamily: string
-  isUpperCase?: boolean
-  color?: string
 }

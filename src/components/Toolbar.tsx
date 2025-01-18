@@ -90,8 +90,8 @@ export function Toolbar({
               />
 
               <BackgroundColorPicker
-                value={backgroundColor}
-                onChange={setBackgroundColor}
+                backgroundColor={backgroundColor}
+                setBackgroundColor={setBackgroundColor}
               />
             </div>
           </CardContent>

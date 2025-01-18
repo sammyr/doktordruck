@@ -125,6 +125,22 @@ export function PrintMenubar({
           <MenubarItem>Lineale anzeigen</MenubarItem>
         </MenubarContent>
       </MenubarMenu>
+
+      <MenubarMenu>
+        <MenubarTrigger>Hilfe</MenubarTrigger>
+        <MenubarContent>
+          <MenubarItem onClick={() => window.open('CHANGELOG.md', '_blank')}>
+            Changelog
+          </MenubarItem>
+          <MenubarItem onClick={() => window.open('https://github.com/sammyrun/doktordruck/issues/new', '_blank')}>
+            Feature anfragen
+          </MenubarItem>
+          <MenubarSeparator />
+          <MenubarItem onClick={() => window.open('https://github.com/sammyrun/doktordruck', '_blank')}>
+            Info
+          </MenubarItem>
+        </MenubarContent>
+      </MenubarMenu>
     </Menubar>
   )
 }
