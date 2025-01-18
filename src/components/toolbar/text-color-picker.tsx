@@ -33,7 +33,7 @@ export function TextColorPicker({ selectedBlock, onTextBlockUpdate }: TextColorP
 
   return (
     <div className="space-y-2">
-      <Label>Textfarbe</Label>
+      <Label className="select-none">Textfarbe</Label>
       <ColorSwatchGallery
         colors={colors}
         selectedColor={selectedBlock?.color || '#000000'}

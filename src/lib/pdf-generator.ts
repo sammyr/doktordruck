@@ -27,6 +27,50 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
   return btoa(binary);
 }
 
+// Zeichnet die Druckmarken
+function drawPrintMarks(pdf: jsPDF, width: number, height: number) {
+  const { printMarks, bleed } = pdfSettings
+  if (!printMarks.enabled) return
+
+  // Setze die Farbe auf CMYK Schwarz
+  pdf.setDrawColor(
+    printMarks.color.c,
+    printMarks.color.m,
+    printMarks.color.y,
+    printMarks.color.k
+  )
+  pdf.setLineWidth(printMarks.thickness)
+
+  // Zeichne die Schnittmarken an den Ecken
+  const positions = [
+    // Oben links
+    { x: 0, y: 0 },
+    // Oben rechts
+    { x: width + (bleed * 2), y: 0 },
+    // Unten links
+    { x: 0, y: height + (bleed * 2) },
+    // Unten rechts
+    { x: width + (bleed * 2), y: height + (bleed * 2) }
+  ]
+
+  positions.forEach(pos => {
+    // Horizontale Linie
+    pdf.line(
+      pos.x - printMarks.offset,
+      pos.y + bleed,
+      pos.x - printMarks.offset + printMarks.length,
+      pos.y + bleed
+    )
+    // Vertikale Linie
+    pdf.line(
+      pos.x + bleed,
+      pos.y - printMarks.offset,
+      pos.x + bleed,
+      pos.y - printMarks.offset + printMarks.length
+    )
+  })
+}
+
 // Registriere die Schriftarten für jsPDF
 async function registerFonts(pdf: jsPDF) {
   for (const font of fonts) {
@@ -172,6 +216,9 @@ export async function generatePDF(options: PdfGeneratorOptions): Promise<Uint8Ar
     height + (bleed * 2),
     'F'
   )
+
+  // Zeichne die Druckmarken
+  drawPrintMarks(pdf, width, height)
 
   // Füge alle Textblöcke ein
   const pageWidth = width + (bleed * 2)

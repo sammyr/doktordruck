@@ -8,6 +8,20 @@ export const pdfSettings = {
   
   // Minimaler Randabstand in mm
   minMargin: 10,
+
+  // Druckmarken-Einstellungen
+  printMarks: {
+    enabled: true,
+    length: 5,     // Länge der Schnittmarken in mm
+    offset: 3,     // Abstand der Schnittmarken vom Rand in mm
+    thickness: 0.1, // Dicke der Schnittmarken in mm
+    color: {       // Farbe der Schnittmarken (in CMYK)
+      c: 0,
+      m: 0,
+      y: 0,
+      k: 100
+    }
+  },
   
   // Gewicht-Mapping für Schriftarten
   weightMapping: {

@@ -88,7 +88,7 @@ export function TextControls({
 
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label>Schriftart</Label>
+          <Label className="select-none">Schriftart</Label>
           <Select
             value={fontFamily}
             onValueChange={setFontFamily}
@@ -112,7 +112,7 @@ export function TextControls({
         </div>
 
         <div className="space-y-2">
-          <Label>Schriftgewicht</Label>
+          <Label className="select-none">Schriftgewicht</Label>
           <Select
             value={fontWeight?.toString()}
             onValueChange={(value) => setFontWeight(Number(value))}
@@ -137,7 +137,7 @@ export function TextControls({
 
         <div className="grid grid-cols-3 gap-4">
           <div className="space-y-2">
-            <Label>Schriftgröße</Label>
+            <Label className="select-none">Schriftgröße</Label>
             <NumberStepper
               value={fontSize}
               onChange={setFontSize}
@@ -149,7 +149,7 @@ export function TextControls({
           </div>
 
           <div className="space-y-2">
-            <Label>Zeilenhöhe</Label>
+            <Label className="select-none">Zeilenhöhe</Label>
             <NumberStepper
               value={selectedBlock?.lineHeight || 1.2}
               onChange={handleLineHeightChange}
@@ -162,7 +162,7 @@ export function TextControls({
           </div>
 
           <div className="space-y-2">
-            <Label>Buchstabenabstand</Label>
+            <Label className="select-none">Buchstabenabstand</Label>
             <NumberStepper
               value={selectedBlock?.letterSpacing || 0}
               onChange={(value) => {
@@ -183,7 +183,7 @@ export function TextControls({
         </div>
 
         <div className="space-y-2">
-          <Label>Schriftstil & Ausrichtung</Label>
+          <Label className="select-none">Schriftstil & Ausrichtung</Label>
           <FontStyleButtons
             fontStyle={fontStyle}
             setFontStyle={setFontStyle}
@@ -205,7 +205,7 @@ export function TextControls({
         </div>
 
         <div className="space-y-2">
-          <Label>Textfarbe</Label>
+          <Label className="select-none">Textfarbe</Label>
           <TextColorPicker
             selectedBlock={selectedBlock}
             onTextBlockUpdate={onTextBlockUpdate}

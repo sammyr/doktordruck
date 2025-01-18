@@ -78,7 +78,7 @@ export function Toolbar({
   }
 
   return (
-    <div className="h-full bg-gray-50 p-4 overflow-y-auto">
+    <div className="h-full bg-gray-50 p-4 overflow-y-auto select-none">
       <div className="space-y-4">
         {/* Dokumenteinstellungen */}
         <Card>

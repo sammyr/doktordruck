@@ -3,19 +3,22 @@ type TextAlign = 'left' | 'right' | 'center';
 export interface TextBlock {
   id: string
   text: string
+  originalText?: string
   x: number
   y: number
-  color: string
-  fontFamily: string
-  fontSize: number
-  fontWeight: string | number
-  fontStyle: string
   width: number
   height: number
-  zIndex: number
-  textAlign: TextAlign
-  lineHeight: number
-  letterSpacing: number
-  multiline: boolean
-  selected: boolean
+  fontSize?: number
+  fontFamily?: string
+  fontStyle?: string
+  fontWeight?: number | string
+  textAlign?: 'left' | 'center' | 'right'
+  visible?: boolean
+  color?: string
+  letterSpacing?: number
+  lineHeight?: number
+  multiline?: boolean
+  selected?: boolean
+  zIndex?: number
+  isUpperCase?: boolean
 }

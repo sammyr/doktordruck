@@ -102,7 +102,7 @@ export default function DruckPage() {
 
   const handleAddTextBlock = useCallback(() => {
     const newBlock: TextBlock = {
-      id: Math.random().toString(36).substr(2, 9),
+      id: uuidv4(),
       text: 'Neuer Text',
       x: 50,
       y: 50,
@@ -118,6 +118,7 @@ export default function DruckPage() {
       lineHeight: 1.2,
       letterSpacing: 0,
       multiline: false,
+      visible: true,
       selected: true
     }
     // Deselektiere alle anderen Blöcke und füge den neuen Block hinzu
@@ -207,8 +208,9 @@ export default function DruckPage() {
           pageSize={pageSize}
           textBlocks={textBlocks}
           onTextBlockUpdate={handleTextBlockUpdate}
-          onTextBlockSelect={setSelectedBlockId}
+          onTextBlockSelect={handleTextBlockSelect}
           onAddTextBlock={handleAddTextBlock}
+          onDeleteBlock={handleDeleteTextBlock}
         />
       </div>
       <div className="flex relative" style={{ width: `${stageWidth}%` }}>
@@ -249,8 +251,12 @@ export default function DruckPage() {
             </div>
             <div style={{ height: `${layerPanelHeight}vh` }}>
               <LayerPanel
-                blocks={textBlocks}
+                textBlocks={textBlocks}
                 onTextBlockUpdate={handleTextBlockUpdate}
+                onDeleteBlock={handleDeleteTextBlock}
+                onReorderBlocks={setTextBlocks}
+                selectedBlockId={selectedBlockId}
+                onBlockSelect={setSelectedBlockId}
               />
             </div>
           </div>

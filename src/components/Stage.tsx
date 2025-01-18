@@ -20,6 +20,7 @@ interface StageProps {
   onTextBlockUpdate: (block: TextBlock) => void
   onTextBlockSelect: (id: string) => void
   onAddTextBlock: () => void
+  onDeleteBlock: (blockId: string) => void
   fontFamily: string
   fontSize: number
   fontStyle: string
@@ -34,6 +35,7 @@ export function Stage({
   onTextBlockUpdate,
   onTextBlockSelect,
   onAddTextBlock,
+  onDeleteBlock,
   fontFamily,
   fontSize,
   fontStyle,
@@ -393,80 +395,82 @@ export function Stage({
             </>
           )}
           {/* Textblöcke */}
-          {textBlocks.map(block => (
-            <div
-              key={block.id}
-              className={`absolute ${
-                block.selected ? `ring-2 ring-[${stageSettings.colors.selection}]/${stageSettings.colors.selectionOpacity}` : ''
-              }`}
-              style={{
-                position: 'absolute',
-                left: `${block.x}%`,
-                top: `${block.y}%`,
-                color: block.color,
-                fontFamily: block.fontFamily,
-                fontSize: `${block.fontSize}px`,
-                fontWeight: String(block.fontWeight),
-                fontStyle: (block.fontStyle || '').includes('italic') ? 'italic' : 'normal',
-                userSelect: 'none',
-                transform: 'translate(-50%, -50%)',
-                whiteSpace: block.multiline ? 'normal' : 'nowrap',
-                width: editingText === block.id ? 
-                       `${Math.max(block.width || 20, 30)}%` : // Mindestens 30% beim Bearbeiten
-                       (block.multiline ? `${block.width || 20}%` : 'auto'),
-                lineHeight: block.lineHeight || 1.2,
-                textAlign: (['left', 'right', 'center'].includes(block.textAlign) ? block.textAlign : 'left'),
-                letterSpacing: `${block.letterSpacing || 0}px`,
-                cursor: editingText === block.id ? stageSettings.cursors.textBlock.editing : stageSettings.cursors.textBlock.default,
-                zIndex: block.zIndex,
-                padding: editingText === block.id ? '4px' : '0'
-              }}
-              onMouseDown={(e) => {
-                handleMouseDown(e, block)
-                onTextBlockSelect(block.id)
-                setSelectedText(block.id)
-              }}
-              onDoubleClick={() => handleTextDoubleClick(block.id)}
-            >
-              {editingText === block.id ? (
-                <textarea
-                  value={block.text}
-                  onChange={(e) => handleTextChange(block.id, e.target.value)}
-                  onBlur={() => setEditingText(null)}
-                  autoFocus
-                  style={{
-                    background: 'transparent',
-                    border: 'none',
-                    outline: 'none',
-                    color: 'inherit',
-                    font: 'inherit',
-                    resize: 'none',
-                    width: '100%',
-                    height: 'auto',
-                    minHeight: '1.2em',
-                    display: 'block',
-                    margin: 0,
-                    padding: 0,
-                    overflow: 'hidden'
-                  }}
-                  rows={Math.max((block.text.match(/\n/g) || []).length + 1, 1)}
-                  onInput={(e) => {
-                    // Automatische Höhenanpassung
-                    const target = e.target as HTMLTextAreaElement
-                    target.style.height = 'auto'
-                    target.style.height = `${target.scrollHeight}px`
-                  }}
-                />
-              ) : (
-                block.text.split('\n').map((line, i) => (
-                  <React.Fragment key={i}>
-                    {line}
-                    {i < block.text.split('\n').length - 1 && <br />}
-                  </React.Fragment>
-                ))
-              )}
-            </div>
-          ))}
+          {textBlocks
+            .filter(block => block.visible !== false)
+            .map(block => (
+              <div
+                key={block.id}
+                className={`absolute ${
+                  block.selected ? `ring-2 ring-[${stageSettings.colors.selection}]/${stageSettings.colors.selectionOpacity}` : ''
+                }`}
+                style={{
+                  position: 'absolute',
+                  left: `${block.x}%`,
+                  top: `${block.y}%`,
+                  color: block.color,
+                  fontFamily: block.fontFamily,
+                  fontSize: `${block.fontSize}px`,
+                  fontWeight: String(block.fontWeight),
+                  fontStyle: (block.fontStyle || '').includes('italic') ? 'italic' : 'normal',
+                  userSelect: 'none',
+                  transform: 'translate(-50%, -50%)',
+                  whiteSpace: block.multiline ? 'normal' : 'nowrap',
+                  width: editingText === block.id ? 
+                         `${Math.max(block.width || 20, 30)}%` : // Mindestens 30% beim Bearbeiten
+                         (block.multiline ? `${block.width || 20}%` : 'auto'),
+                  lineHeight: block.lineHeight || 1.2,
+                  textAlign: (['left', 'right', 'center'].includes(block.textAlign) ? block.textAlign : 'left'),
+                  letterSpacing: `${block.letterSpacing || 0}px`,
+                  cursor: editingText === block.id ? stageSettings.cursors.textBlock.editing : stageSettings.cursors.textBlock.default,
+                  zIndex: block.zIndex,
+                  padding: editingText === block.id ? '4px' : '0'
+                }}
+                onMouseDown={(e) => {
+                  handleMouseDown(e, block)
+                  onTextBlockSelect(block.id)
+                  setSelectedText(block.id)
+                }}
+                onDoubleClick={() => handleTextDoubleClick(block.id)}
+              >
+                {editingText === block.id ? (
+                  <textarea
+                    value={block.text}
+                    onChange={(e) => handleTextChange(block.id, e.target.value)}
+                    onBlur={() => setEditingText(null)}
+                    autoFocus
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      outline: 'none',
+                      color: 'inherit',
+                      font: 'inherit',
+                      resize: 'none',
+                      width: '100%',
+                      height: 'auto',
+                      minHeight: '1.2em',
+                      display: 'block',
+                      margin: 0,
+                      padding: 0,
+                      overflow: 'hidden'
+                    }}
+                    rows={Math.max((block.text.match(/\n/g) || []).length + 1, 1)}
+                    onInput={(e) => {
+                      // Automatische Höhenanpassung
+                      const target = e.target as HTMLTextAreaElement
+                      target.style.height = 'auto'
+                      target.style.height = `${target.scrollHeight}px`
+                    }}
+                  />
+                ) : (
+                  block.text.split('\n').map((line, i) => (
+                    <React.Fragment key={i}>
+                      {line}
+                      {i < block.text.split('\n').length - 1 && <br />}
+                    </React.Fragment>
+                  ))
+                )}
+              </div>
+            ))}
         </div>
 
         {/* Zoom-Indikator */}

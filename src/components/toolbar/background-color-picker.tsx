@@ -19,7 +19,7 @@ export function BackgroundColorPicker({ backgroundColor, setBackgroundColor }: B
 
   return (
     <div className="space-y-2">
-      <Label>Hintergrundfarbe</Label>
+      <Label className="select-none">Hintergrundfarbe</Label>
       <ColorSwatchGallery
         colors={colors}
         selectedColor={backgroundColor}
