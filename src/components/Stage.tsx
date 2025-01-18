@@ -6,8 +6,10 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react'
 import { TextBlock } from '@/types/text'
 import paperSizes from '@/data/paper-sizes.json'
-import { ZoomIn, ZoomOut, RotateCcw, Type } from 'lucide-react'
+import { ZoomIn, ZoomOut, Grid as GridIcon, Ruler as RulerIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Ruler } from '@/components/ui/ruler'
+import { Grid } from '@/components/ui/grid'
 import { useDragAndDrop } from '@/hooks/useDragAndDrop'
 import { stageSettings } from '@/config/settings'
 
@@ -48,6 +50,8 @@ export function Stage({
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const [showCenterGuide, setShowCenterGuide] = useState(false)
   const [guidePosition, setGuidePosition] = useState<{ x: number, y: number } | null>(null)
+  const [showGrid, setShowGrid] = useState(false)
+  const [showRuler, setShowRuler] = useState(false)
 
   const handleWheel = useCallback((e: React.WheelEvent<HTMLDivElement>) => {
     e.preventDefault()
@@ -249,6 +253,77 @@ export function Stage({
     }
   }, [textBlocks, onTextBlockUpdate])
 
+  // Funktion zum Konvertieren von Pixeln in Millimeter basierend auf der DPI
+  const pxToMm = useCallback((px: number) => {
+    const dpi = 96 // Standard-Bildschirm-DPI
+    return (px * 25.4) / dpi // 25.4mm = 1 inch
+  }, [])
+
+  // Funktion zum Erstellen der Lineal-Markierungen
+  const generateRulerMarks = useCallback((length: number, isHorizontal: boolean) => {
+    const marks = []
+    const step = 10 // 10mm Hauptmarkierungen
+    const smallStep = 1 // 1mm kleine Markierungen
+    const maxValue = Math.ceil(length) // Runde auf zur nächsten ganzen Zahl
+    
+    // Füge alle Markierungen hinzu
+    for (let i = 0; i <= maxValue; i += smallStep) {
+      const position = `${(i / maxValue) * 100}%`
+      const isMainMark = i % step === 0
+      const isLastMark = i === maxValue
+      
+      // Füge Markierungslinie hinzu
+      if (isMainMark || isLastMark) {
+        marks.push(
+          <div
+            key={i}
+            className={`absolute bg-gray-400 ${isHorizontal ? 'top-0' : 'left-0'}`}
+            style={{
+              [isHorizontal ? 'left' : 'top']: position,
+              [isHorizontal ? 'height' : 'width']: isMainMark ? '6px' : '3px',
+              [isHorizontal ? 'width' : 'height']: '0.5px'
+            }}
+          />
+        )
+        
+        // Füge Beschriftung hinzu
+        marks.push(
+          <div
+            key={`label-${i}`}
+            className={`absolute text-[4px] text-gray-500 ${
+              isHorizontal ? 'top-2' : 'left-2'
+            } transform ${isHorizontal ? '-translate-x-1/2' : '-translate-y-1/2'}`}
+            style={{
+              [isHorizontal ? 'left' : 'top']: position
+            }}
+          >
+            {i}
+          </div>
+        )
+      } else {
+        // Kleine Markierungen
+        marks.push(
+          <div
+            key={i}
+            className={`absolute bg-gray-400 ${isHorizontal ? 'top-0' : 'left-0'}`}
+            style={{
+              [isHorizontal ? 'left' : 'top']: position,
+              [isHorizontal ? 'height' : 'width']: '3px',
+              [isHorizontal ? 'width' : 'height']: '0.5px'
+            }}
+          />
+        )
+      }
+    }
+    return marks
+  }, [])
+
+  // Berechne die Gittergröße in Prozent basierend auf der Dokumentbreite/-höhe
+  const calculateGridSize = useCallback((size: number) => {
+    // 10mm Gitterabstand
+    return (10 / size) * 100 + '%'
+  }, [])
+
   // Finde die Seitengröße aus der JSON-Datei
   const posterSize = [
     ...paperSizes.poster.portrait,
@@ -277,9 +352,15 @@ export function Stage({
             width: posterSize?.width || 500,
             height: posterSize?.height || 700,
             backgroundColor,
-            transition: isDragging ? 'none' : `transform ${stageSettings.dragAndDrop.transitionDuration}ms ease-out`
+            transition: isDragging ? 'none' : `transform ${stageSettings.dragAndDrop.transitionDuration}ms ease-out`,
+            ...(showGrid && Grid({ width: posterSize?.width || 500, height: posterSize?.height || 700, showGrid }))
           }}
         >
+          <Ruler 
+            width={posterSize?.width || 500}
+            height={posterSize?.height || 700}
+            showRuler={showRuler}
+          />
           {/* Hilfslinien */}
           {showCenterGuide && guidePosition && (
             <>
@@ -395,14 +476,14 @@ export function Stage({
       {/* !!! WICHTIG: Diese Skalierungsleiste ist essentiell für die Zoom-Funktionalität !!! */}
       {/* !!! Sie darf NICHT gelöscht oder verändert werden !!! */}
       {/* Skalierungsleiste */}
-      <div className="w-16 bg-white p-4 border-l flex flex-col items-center space-y-4">
+      <div className="w-20 bg-white p-4 border-l flex flex-col items-center space-y-4">
         <Button
           variant="ghost"
           size="sm"
           onClick={handleZoomIn}
-          className="w-8 h-8"
+          className="w-12 h-12"
         >
-          <ZoomIn className="w-4 h-4" />
+          <ZoomIn className="w-6 h-6" />
         </Button>
 
         <div className="text-sm font-medium">
@@ -413,31 +494,44 @@ export function Stage({
           variant="ghost"
           size="sm"
           onClick={handleZoomOut}
-          className="w-8 h-8"
+          className="w-12 h-12"
         >
-          <ZoomOut className="w-4 h-4" />
+          <ZoomOut className="w-6 h-6" />
         </Button>
 
         <Button
           variant="ghost"
           size="sm"
-          onClick={handleResetView}
-          className="w-8 h-8"
-          title="Ansicht zurücksetzen"
+          onClick={() => setShowGrid(!showGrid)}
+          className="w-12 h-12"
+          title="Gitter anzeigen"
         >
-          <RotateCcw className="w-4 h-4" />
+          <GridIcon className="w-6 h-6" />
         </Button>
 
         <Button
           variant="ghost"
           size="sm"
-          onClick={onAddTextBlock}
-          className="w-8 h-8"
-          title="Text hinzufügen"
+          onClick={() => setShowRuler(!showRuler)}
+          className="w-12 h-12"
+          title="Lineal anzeigen"
         >
-          <Type className="w-4 h-4" />
+          <RulerIcon className="w-6 h-6" />
         </Button>
       </div>
     </div>
   )
+}
+
+interface TextBlock {
+  id: string
+  text: string
+  originalText?: string
+  x: number
+  y: number
+  fontSize: number
+  textAlign: 'left' | 'center' | 'right'
+  fontFamily: string
+  isUpperCase?: boolean
+  color?: string
 }

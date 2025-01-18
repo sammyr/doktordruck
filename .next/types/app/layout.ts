@@ -1,4 +1,4 @@
-// File: d:\___SYSTEM\Desktop\_NPM\doktordruck\src\app\layout.tsx
+// File: D:\___SYSTEM\Desktop\_NPM\doktordruck\src\app\layout.tsx
 import * as entry from '../../../src/app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

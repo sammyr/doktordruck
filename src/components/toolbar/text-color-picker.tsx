@@ -56,11 +56,11 @@ export function TextColorPicker({
           />
         </div>
         
-        <div className="grid grid-cols-5 gap-1">
+        <div className="grid grid-cols-6 gap-2 p-2">
           {colorPalette.text.map((color, index) => (
             <button
               key={`text-${color}-${index}`}
-              className={`w-6 h-6 rounded-full border transition-all ${
+              className={`w-8 h-8 rounded-lg border transition-all ${
                 selectedBlock?.color === color 
                   ? 'border-blue-500 scale-110' 
                   : 'border-gray-200 hover:scale-105'

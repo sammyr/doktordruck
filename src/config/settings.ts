@@ -50,8 +50,8 @@ export const stageSettings = {
     initial: 1.8,     // Initiale Zoom-Stufe (180%)
     min: 0.1,         // Minimale Zoom-Stufe (10%)
     max: 5,           // Maximale Zoom-Stufe (500%)
-    step: 0.15,       // Zoom-Schritt bei Mausrad
-    buttonStep: 0.1,  // Zoom-Schritt bei Button-Klick
+    step: 0.2,        // Zoom-Schritt bei Mausrad (20%)
+    buttonStep: 0.2,  // Zoom-Schritt bei Button-Klick (20%)
     speed: {
       wheel: 1.5,     // Multiplikator für Mausrad-Zoom-Geschwindigkeit
       smooth: true    // Aktiviert sanftes Zoomen
@@ -69,7 +69,7 @@ export const stageSettings = {
     guides: {
       color: '#000',  // Farbe der Hilfslinien
       opacity: 0.5,      // Deckkraft der Hilfslinien
-      thickness: 0.5       // Dicke der Hilfslinien in Pixeln
+      thickness: 0.2       // Dicke der Hilfslinien in Pixeln
     }
   },
 
